@@ -1,0 +1,110 @@
+created:
+    - database/factories/RoleFactory.php
+    - database/factories/UserFactory.php
+    - database/factories/PermissionFactory.php
+    - database/factories/RolePermissionFactory.php
+    - database/factories/DistrictFactory.php
+    - database/factories/VillageFactory.php
+    - database/factories/TicketFactory.php
+    - database/factories/InformationFactory.php
+    - database/factories/AuditLogFactory.php
+    - database/factories/GuideFactory.php
+    - database/factories/TicketResponseFactory.php
+    - database/factories/TicketFeedbackFactory.php
+    - database/factories/ContractorFactory.php
+    - database/factories/ConsultantFactory.php
+    - database/factories/FacilityFactory.php
+    - database/factories/SurveyFactory.php
+    - database/factories/SurveyPhotoFactory.php
+    - database/factories/ProcurementOfficerFactory.php
+    - database/factories/OfficerFactory.php
+    - database/factories/WorkFactory.php
+    - database/factories/ConstructionFactory.php
+    - database/factories/PlanFactory.php
+    - database/factories/ConsolPlanFactory.php
+    - database/factories/ConsolPlanDetailFactory.php
+    - database/factories/ConsolSpvFactory.php
+    - database/factories/ConsolSpvDetailFactory.php
+    - database/factories/SpvFactory.php
+    - database/migrations/2024_11_30_150621_create_roles_table.php
+    - database/migrations/2024_11_30_150622_create_users_table.php
+    - database/migrations/2024_11_30_150623_create_permissions_table.php
+    - database/migrations/2024_11_30_150624_create_role_permissions_table.php
+    - database/migrations/2024_11_30_150625_create_districts_table.php
+    - database/migrations/2024_11_30_150626_create_villages_table.php
+    - database/migrations/2024_11_30_150627_create_tickets_table.php
+    - database/migrations/2024_11_30_150628_create_information_table.php
+    - database/migrations/2024_11_30_150629_create_audit_logs_table.php
+    - database/migrations/2024_11_30_150630_create_guides_table.php
+    - database/migrations/2024_11_30_150631_create_ticket_responses_table.php
+    - database/migrations/2024_11_30_150632_create_ticket_feedback_table.php
+    - database/migrations/2024_11_30_150633_create_contractors_table.php
+    - database/migrations/2024_11_30_150634_create_consultants_table.php
+    - database/migrations/2024_11_30_150635_create_facilities_table.php
+    - database/migrations/2024_11_30_150636_create_surveys_table.php
+    - database/migrations/2024_11_30_150637_create_survey_photos_table.php
+    - database/migrations/2024_11_30_150638_create_procurement_officers_table.php
+    - database/migrations/2024_11_30_150639_create_officers_table.php
+    - database/migrations/2024_11_30_150640_create_works_table.php
+    - database/migrations/2024_11_30_150641_create_constructions_table.php
+    - database/migrations/2024_11_30_150642_create_plans_table.php
+    - database/migrations/2024_11_30_150643_create_consol_plans_table.php
+    - database/migrations/2024_11_30_150644_create_consol_plan_details_table.php
+    - database/migrations/2024_11_30_150645_create_consol_spvs_table.php
+    - database/migrations/2024_11_30_150646_create_consol_spv_details_table.php
+    - database/migrations/2024_11_30_150647_create_spvs_table.php
+    - app/Models/Role.php
+    - app/Models/User.php
+    - app/Models/Permission.php
+    - app/Models/RolePermission.php
+    - app/Models/District.php
+    - app/Models/Village.php
+    - app/Models/Ticket.php
+    - app/Models/Information.php
+    - app/Models/AuditLog.php
+    - app/Models/Guide.php
+    - app/Models/TicketResponse.php
+    - app/Models/TicketFeedback.php
+    - app/Models/Contractor.php
+    - app/Models/Consultant.php
+    - app/Models/Facility.php
+    - app/Models/Survey.php
+    - app/Models/SurveyPhoto.php
+    - app/Models/ProcurementOfficer.php
+    - app/Models/Officer.php
+    - app/Models/Work.php
+    - app/Models/Construction.php
+    - app/Models/Plan.php
+    - app/Models/ConsolPlan.php
+    - app/Models/ConsolPlanDetail.php
+    - app/Models/ConsolSpv.php
+    - app/Models/ConsolSpvDetail.php
+    - app/Models/Spv.php
+models:
+    Role: { id: id, name: string, timestamps: false, relationships: { hasMany: 'User, RolePermission' } }
+    User: { id: id, name: string, email: string, password: string, role_id: 'id foreign:roles', email_verified_at: 'timestamp nullable', timestamps: timestamps, relationships: { belongsTo: Role, hasMany: 'Ticket, TicketFeedback, AuditLog' } }
+    Permission: { id: id, name: string, timestamps: false, relationships: { hasMany: RolePermission } }
+    RolePermission: { role_id: 'id foreign:roles', permission_id: 'id foreign:permissions', timestamps: false, relationships: { belongsTo: 'Role, Permission' } }
+    District: { id: id, geom: text, code: string, name: string, slug: string, timestamps: false, relationships: { hasMany: 'Village, Ticket, Construction, Facility, Survey, Pokir, Musrenbang' } }
+    Village: { id: id, geom: text, code: string, name: string, district_id: 'id foreign:districts', slug: string, timestamps: false, relationships: { belongsTo: District, hasMany: 'Ticket, Facility, Survey' } }
+    Ticket: { id: uuid, user_id: 'id foreign:users', type: string, issue: text, district_id: 'id foreign:districts', village_id: 'id foreign:villages', photo_url: 'string nullable', lat: string, lng: string, status: 'string default:open', timestamps: timestamps, relationships: { belongsTo: 'User, District, Village', hasMany: TicketResponse } }
+    Information: { id: id, title: string, description: text, info_url: string, timestamps: timestamps }
+    AuditLog: { id: id, user_id: 'id foreign:users', action: string, model_type: string, model_id: uuid, ip_address: string, timestamps: timestamps, relationships: { belongsTo: User } }
+    Guide: { id: id, type: string, thumbnail: string, description: text, guide_url: string, timestamps: timestamps }
+    TicketResponse: { id: uuid, ticket_id: 'uuid foreign:tickets', admin_id: 'id foreign:users', issue: text, response: text, timestamps: timestamps, relationships: { belongsTo: 'Ticket, User' } }
+    TicketFeedback: { id: uuid, ticket_id: 'uuid foreign:tickets', user_id: 'id foreign:users', feedback: text, rating: integer, timestamps: timestamps, relationships: { belongsTo: 'Ticket, User' } }
+    Contractor: { id: id, name: string, akta: string, founding_date: date, notary: string, address: string, npwp: string, leader: string, position: string, slug: string, account_number: string, account_holder: string, header_scan: 'string nullable', account_scan: 'string nullable', npwp_scan: 'string nullable', timestamps: timestamps, relationships: { hasMany: 'Facility, Construction, Work' } }
+    Consultant: { id: id, name: string, akta: string, founding_date: date, notary: string, address: string, npwp: string, leader: string, position: string, slug: string, account_number: string, account_holder: string, header_scan: 'string nullable', account_scan: 'string nullable', npwp_scan: 'string nullable', timestamps: timestamps, relationships: { hasMany: 'Facility, Work, Construction, Spv, Plan, ConsolSpv, ConsolPlan' } }
+    Facility: { id: id, name: string, contractor_id: 'id foreign:contractors', consultant_id: 'id foreign:consultants', district_id: 'id foreign:districts', village_id: 'id foreign:villages', length: decimal, width: 'decimal nullable', lat: string, lng: string, real_1: 'decimal nullable', real_2: 'decimal nullable', real_3: 'decimal nullable', real_4: 'decimal nullable', real_5: 'decimal nullable', real_6: 'decimal nullable', real_7: 'decimal nullable', real_8: 'decimal nullable', photo_0: 'string nullable', photo_50: 'string nullable', photo_100: 'string nullable', photo_pho: 'string nullable', note: 'text nullable', note_pho: 'text nullable', team: 'json nullable', construct_type: string, spending_type: string, timestamps: timestamps, relationships: { belongsTo: 'District, Village, Contractor, Consultant' } }
+    Survey: { id: id, name: string, supervisor: string, district_id: 'id foreign:districts', village_id: 'id foreign:villages', length: decimal, type: string, program: string, lat: string, lng: string, note: 'text nullable', timestamps: timestamps, relationships: { belongsTo: 'District, Village', hasMany: SurveyPhoto } }
+    SurveyPhoto: { id: id, survey_id: 'id foreign:surveys', description: text, photo_url: string, timestamps: timestamps, relationships: { belongsTo: Survey } }
+    ProcurementOfficer: { id: id, name: string, nip: string, grade: 'string nullable', timestamps: timestamps, relationships: { hasMany: 'Work, Construction, Spv, Plan, ConsolSpv, ConsolPlan' } }
+    Officer: { id: id, name: string, nip: string, grade: 'string nullable', timestamps: timestamps }
+    Work: { id: id, year: integer, name: string, contract_date: 'date nullable', contract_number: string, contractor_id: 'id foreign:contractors', consultant_id: 'id foreign:consultants', supervisor_id: 'id foreign:consultants', contract_value: decimal, progress: 'decimal default:0', cutoff: date, status: "string default:'belum kontrak'", paid: 'decimal nullable', timestamps: timestamps, relationships: { belongsTo: 'Contractor, Consultant' } }
+    Construction: { id: id, procurement_officer_id: 'id foreign:procurement_officers', oe: decimal, bid_value: decimal, correction_value: decimal, nego_value: decimal, contractor_id: 'id foreign:contractors', invite_date: date, evaluation_date: date, nego_date: date, BAHPL_date: date, sppbj_date: date, spk_date: date, account_type: string, program: "string default:'P4K'", duration: integer, district_id: 'id foreign:districts', location: string, consultant_id: 'id foreign:consultants', timestamps: timestamps, relationships: { belongsTo: 'ProcurementOfficer, District, Contractor, Consultant' } }
+    Plan: { id: id, year: integer, procurement_officer_id: 'id foreign:procurement_officers', oe: decimal, bid_value: decimal, correction_value: decimal, nego_value: decimal, consultant_id: 'id foreign:consultants', invite_date: date, evaluation_date: date, nego_date: date, BAHPL_date: date, sppbj_date: date, spk_date: date, account_type: string, program: string, duration: integer, timestamps: timestamps, relationships: { belongsTo: 'ProcurementOfficer, Consultant' } }
+    ConsolPlan: { id: id, year: integer, procurement_officer_id: 'id foreign:procurement_officers', bid_value: decimal, correction_value: decimal, nego_value: decimal, consultant_id: 'id foreign:consultants', invite_date: date, evaluation_date: date, nego_date: date, BAHPL_date: date, sppbj_date: date, spk_date: date, account_type: string, program: string, duration: integer, timestamps: timestamps, relationships: { belongsTo: 'ProcurementOfficer, Consultant', hasMany: ConsolPlanDetail } }
+    ConsolPlanDetail: { id: id, consolidation_id: 'id foreign:consol_plans', budget: decimal, name: string, nego_value: decimal, timestamps: timestamps, relationships: { belongsTo: ConsolPlan } }
+    ConsolSpv: { id: id, year: integer, procurement_officer_id: 'id foreign:procurement_officers', bid_value: decimal, correction_value: decimal, nego_value: decimal, consultant_id: 'id foreign:consultants', invite_date: date, evaluation_date: date, nego_date: date, BAHPL_date: date, sppbj_date: date, spk_date: date, account_type: string, program: string, duration: integer, timestamps: timestamps, relationships: { belongsTo: 'ProcurementOfficer, Consultant', hasMany: ConsolSpvDetail } }
+    ConsolSpvDetail: { id: id, consolidation_id: 'id foreign:consol_spvs', budget: decimal, name: string, nego_value: decimal, timestamps: timestamps, relationships: { belongsTo: ConsolSpv } }
+    Spv: { id: id, procurement_officer_id: 'id foreign:procurement_officers', oe: decimal, bid_value: decimal, correction_value: decimal, nego_value: decimal, consultant_id: 'id foreign:consultants', invite_date: date, evaluation_date: date, nego_date: date, BAHPL_date: date, sppbj_date: date, spk_date: date, account_type: string, program: "string default:'P4K'", duration: integer, timestamps: timestamps, relationships: { belongsTo: 'ProcurementOfficer, Consultant' } }
