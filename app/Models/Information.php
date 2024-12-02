@@ -16,6 +16,7 @@ class Information extends Model
      */
     protected $fillable = [
         'title',
+        'thumbnail',
         'description',
         'info_url',
     ];

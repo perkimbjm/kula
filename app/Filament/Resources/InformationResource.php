@@ -30,6 +30,9 @@ class InformationResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->placeholder('Masukkan link berita dan informasi diawali https://'),
+                Forms\Components\FileUpload::make('thumbnail')
+                    ->image()
+                    ->directory('info'),
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull(),
@@ -44,6 +47,7 @@ class InformationResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('info_url')
                     ->searchable(),
+                Tables\Columns\ImageColumn::make('thumbnail'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

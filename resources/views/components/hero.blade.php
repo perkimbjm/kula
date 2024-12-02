@@ -4,9 +4,9 @@
     <h2 class="text-2xl md:text-4xl font-semibold text-white mb-6 max-w-3xl mx-auto leading-tight">
         Kolaborasi Usulan Laporan Aduan Perumahan Rakyat dan Kawasan Permukiman
     </h2>
-    <button class="bg-yellow-400 text-gray-300 px-8 py-2 rounded-full hover:bg-yellow-500 hover:font-semibold hover:text-gray-200 transition">
+    <a href="/app" class="bg-yellow-400 text-gray-300 px-8 py-2 rounded-full hover:bg-yellow-500 hover:font-semibold hover:text-gray-200 transition">
         Login →
-    </button>
+    </a>
 
     <div class="container mx-auto px-4 relative">
         <div class="rounded-3xl p-2">
