@@ -39,7 +39,7 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div x-show="isOpen" x-transition class="absolute inset-x-0 top-16 z-50 bg-green-700 dark:bg-green-900 text-white md:hidden hover:bg-green-600 shadow-lg"
+        <div x-show="isOpen" x-transition class="absolute z-50 inset-x-0 top-16 bg-green-700 dark:bg-green-900 text-white md:hidden hover:bg-green-600 shadow-lg"
   id="mobile-menu">
             <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                 <x-nav-link href="/" :active="request()->is('home')">Beranda</x-nav-link>

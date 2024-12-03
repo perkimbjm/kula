@@ -4,9 +4,14 @@
     @include('components.meta')
 
     <title>{{ config('app.name', 'Kula Rakat') }}</title>
-    <link rel=preconnect href="https://fonts.googleapis.com/css2?family=Lato:wght@300&family=Oswald:wght@300&family=Roboto:wght@300&display=swap" rel="stylesheet">
-    <link rel="manifest" href="{{ asset('js/manifest.webmanifest') }}">
+    
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @stack('before-style')
+
+        @include('components.style')
+    
+    @stack('after-style')
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>

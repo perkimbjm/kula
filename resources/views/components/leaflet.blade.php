@@ -3,4 +3,5 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" crossorigin="" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css" crossorigin="" />
 <link rel="stylesheet" href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" crossorigin="" />
-<link rel="stylesheet" href='{{ asset('css/locateControl.css') }}' />
+<link rel="stylesheet" href='{{ asset('css/map/locateControl.css') }}' />
+<link rel="stylesheet" href='{{ asset('css/map/Control.Geocoder.css') }}' />
