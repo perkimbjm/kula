@@ -90,6 +90,21 @@ function showModal(title, content) {
     }
 }
 
+function closeModal() {
+    const modal = document.getElementById("featureModal");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+}
+
+// Tambahkan event listener untuk tombol close
+document
+    .getElementById("closeModalButton")
+    .addEventListener("click", closeModal);
+document
+    .getElementById("closeModalFooterButton")
+    .addEventListener("click", closeModal);
+
 function zoomToFeature(e) {
     map.fitBounds(e.target.getBounds());
 }
@@ -110,7 +125,7 @@ let kecamatan = L.geoJson(null, {
                     Paringin: "#87CEEB",
                     "Paringin Selatan": "#FFFF00",
                     "Tebing Tinggi": "#CCFFCC",
-                }[feature.properties.name] || "#FFFFFF",
+                }[feature.properties.KECAMATAN] || "#FFFFFF",
             fillOpacity: 0.6,
             opacity: 0.5,
             width: 0.001,
@@ -141,7 +156,7 @@ let isKecamatanLoaded = false;
 // Fungsi untuk memuat data kecamatan
 function loadKecamatanData() {
     if (!isKecamatanLoaded) {
-        fetch("https://sibedahseru.web.id/api/kecamatan/geojson")
+        fetch("data/KECAMATAN_AR.geojson", {})
             .then((response) => response.json())
             .then((data) => {
                 L.geoJson(data, {
@@ -151,7 +166,7 @@ function loadKecamatanData() {
                             direction: "center",
                             className: "no-background",
                         })
-                            .setContent(feature.properties.name)
+                            .setContent(feature.properties.KECAMATAN)
                             .setLatLng(layer.getBounds().getCenter());
 
                         tooltipKecamatan.addLayer(tooltip);
@@ -180,12 +195,6 @@ let desa = L.geoJson(null, {
         };
     },
     onEachFeature: function (feature, layer) {
-        DesaSearch.push({
-            name: layer.feature.properties.name,
-            source: "desa",
-            id: L.stamp(layer),
-            bounds: layer.getBounds(),
-        });
         layer.on({
             mouseover: function (e) {
                 let layer = e.target;
@@ -209,7 +218,7 @@ let isDesaLoaded = false;
 // Fungsi untuk memuat data desa
 function loadDesaData() {
     if (!isDesaLoaded) {
-        fetch("https://sibedahseru.web.id/api/desa/geojson")
+        fetch("data/DESA_AR.geojson")
             .then((response) => response.json())
             .then((data) => {
                 L.geoJson(data, {
@@ -219,7 +228,7 @@ function loadDesaData() {
                             direction: "center",
                             className: "no-background",
                         })
-                            .setContent(feature.properties.name)
+                            .setContent(feature.properties.DESA)
                             .setLatLng(layer.getBounds().getCenter());
 
                         tooltipDesa.addLayer(tooltip);
@@ -289,7 +298,7 @@ let isKumuhLoaded = false;
 
 function loadKumuhData() {
     if (!isKumuhLoaded) {
-        fetch("https://sibedahseru.web.id/data/KUMUH_AR.geojson")
+        fetch("data/KUMUH_AR.geojson")
             .then((response) => response.json())
             .then((data) => {
                 kumuh.addData(data);
@@ -307,7 +316,7 @@ map.on("overlayadd", function (e) {
         loadKecamatanData();
     } else if (e.name === "Kel / Desa" || e.name === "Nama Desa") {
         loadDesaData();
-    } else if (e.name === "Deliniasi Kumuh") {
+    } else if (e.name === "Permukiman Kumuh") {
         loadKumuhData();
     }
 });
@@ -342,7 +351,7 @@ map.on("overlayremove", function (e) {
     }
 
     // Handle Kumuh layer
-    if (e.name === "Deliniasi Kumuh") {
+    if (e.name === "Permukiman Kumuh") {
         if (map.hasLayer(kumuh)) {
             map.removeLayer(kumuh);
         }
