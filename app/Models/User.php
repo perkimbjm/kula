@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
-class User extends Authenticatable implements AuthenticatableContract
+class User extends Authenticatable implements FilamentUser
 {
-    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -70,5 +69,10 @@ class User extends Authenticatable implements AuthenticatableContract
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return str_ends_with($this->email, '@kularakat.web.id') && $this->hasVerifiedEmail();
     }
 }

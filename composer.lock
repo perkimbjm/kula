@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "911e6bca8c8b992c59d25bea3af0a7a0",
+    "content-hash": "b5fb60632f85c854a6ec6e47aa53e363",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3456,6 +3456,69 @@
                 }
             ],
             "time": "2024-11-12T13:57:08+00:00"
+        },
+        {
+            "name": "motomedialab/simple-laravel-audit",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/motomedialab/simple-laravel-audit.git",
+                "reference": "fe52504b2326b4b0fa0aa734d194a7e89ff8d35d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/motomedialab/simple-laravel-audit/zipball/fe52504b2326b4b0fa0aa734d194a7e89ff8d35d",
+                "reference": "fe52504b2326b4b0fa0aa734d194a7e89ff8d35d",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^9.0|^10.0|^11.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0",
+                "laravel/pint": "^1.17",
+                "orchestra/testbench": "^7.0|^8.0|^9.0",
+                "pestphp/pest": "^1.0|^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Motomedialab\\SimpleLaravelAudit\\Providers\\SimpleAuditServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Motomedialab\\SimpleLaravelAudit\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Page",
+                    "email": "chris@motocom.co.uk"
+                }
+            ],
+            "description": "A simple audit helper that integrates directly with Laravel & FilamentPHP",
+            "keywords": [
+                "Audit",
+                "chrispage1",
+                "filament",
+                "laravel",
+                "motomedialab"
+            ],
+            "support": {
+                "issues": "https://github.com/motomedialab/simple-laravel-audit/issues",
+                "source": "https://github.com/motomedialab/simple-laravel-audit/tree/v1.3.1"
+            },
+            "time": "2024-10-15T09:17:00+00:00"
         },
         {
             "name": "nesbot/carbon",

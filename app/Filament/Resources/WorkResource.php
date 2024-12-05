@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\WorkResource\Pages;
-use App\Filament\Resources\WorkResource\RelationManagers;
-use App\Models\Work;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\Work;
 use Filament\Tables;
+use Filament\Forms\Form;
+use App\Enums\WorkStatus;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\WorkResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\WorkResource\RelationManagers;
 
 class WorkResource extends Resource
 {
@@ -51,10 +52,11 @@ class WorkResource extends Resource
                     ->default(0),
                 Forms\Components\DatePicker::make('cutoff')
                     ->required(),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->enum(WorkStatus::class)
+                    ->options(WorkStatus::class)
                     ->required()
-                    ->maxLength(255)
-                    ->default('belum kontrak'),
+                    ->default('belum_kontrak'),
                 Forms\Components\TextInput::make('paid')
                     ->prefix('Rp.')
                     ->numeric(),

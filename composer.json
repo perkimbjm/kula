@@ -11,7 +11,8 @@
         "filament/filament": "^3.2",
         "ibrahimbougaoua/filament-rating-star": "^1.0",
         "laravel/framework": "^11.31",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "motomedialab/simple-laravel-audit": "^1.3"
     },
     "require-dev": {
         "doctrine/dbal": "^4.2",

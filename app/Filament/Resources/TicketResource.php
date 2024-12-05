@@ -5,10 +5,11 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Ticket;
-use Filament\Forms\Set;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Enums\TicketStatus;
 use Filament\Resources\Resource;
 use Dotswan\MapPicker\Fields\Map;
 use Illuminate\Database\Eloquent\Builder;
@@ -100,9 +101,10 @@ class TicketResource extends Resource
                     ->zoom(18)
                     ->detectRetina()
                     ->showMyLocationButton(),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->enum(TicketStatus::class)
+                    ->options(TicketStatus::class)
                     ->required()
-                    ->maxLength(255)
                     ->default('open'),
             ]);
     }
