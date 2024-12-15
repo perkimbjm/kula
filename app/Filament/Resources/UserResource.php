@@ -19,15 +19,21 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Manajemen Pengguna';
+
+    protected static ?string $label = 'User';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->label('Nama')
                     ->maxLength(255),                
                 Forms\Components\TextInput::make('email')
                     ->email()
+                    ->label('E-mail')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
@@ -52,16 +58,21 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('E-mail')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role.name')
+                    ->label('Role')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
+                    ->label('Email Terverifikasi')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('google_id')
+                    ->label('Google ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('avatar'),
                 Tables\Columns\TextColumn::make('created_at')

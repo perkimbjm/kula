@@ -2,22 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\VillageResource\Pages;
-use App\Filament\Resources\VillageResource\RelationManagers;
-use App\Models\Village;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Village;
+use App\Models\District;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\VillageResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\VillageResource\RelationManagers;
 
 class VillageResource extends Resource
 {
     protected static ?string $model = Village::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+
+    protected static ?string $navigationGroup = 'Manajemen Lokasi';
+
+    protected static ?string $label = 'Kelurahan / Desa';
 
     public static function form(Form $form): Form
     {
@@ -28,13 +33,17 @@ class VillageResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('code')
                     ->required()
+                    ->label('Kode Kemendagri')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->label('Nama Kelurahan / Desa')
                     ->maxLength(255),
                 Forms\Components\Select::make('district_id')
-                    ->relationship('district', 'name')
-                    ->required(),
+                    ->label('Kecamatan')
+                    ->options(District::pluck('name', 'id'))
+                    ->required()
+                    ->default(null),
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
@@ -46,11 +55,16 @@ class VillageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                    ->searchable(),
+                    ->label('Kode Kemendagri')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->label('Kelurahan / Desa')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('district.name')
-                    ->numeric()
+                    ->label('Kecamatan')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),

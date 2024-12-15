@@ -23,6 +23,8 @@ class TicketResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
 
+    protected static ?string $navigationGroup = 'Manajemen Usulan';
+
     public static function form(Form $form): Form
     {
         return $form

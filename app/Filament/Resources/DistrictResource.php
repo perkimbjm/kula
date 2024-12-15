@@ -19,6 +19,10 @@ class DistrictResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Manajemen Lokasi';
+
+    protected static ?string $label = 'Kecamatan';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -28,9 +32,11 @@ class DistrictResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('code')
                     ->required()
+                    ->label('Kode Kemendagri')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->label('Nama Kecamatan')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
                     ->required()
@@ -43,8 +49,10 @@ class DistrictResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->label('Kode kemendagri')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Kecamatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
