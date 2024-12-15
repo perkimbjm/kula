@@ -19,7 +19,9 @@ class ConsolPlanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Manajemen Proyek';
+    protected static ?string $navigationGroup = 'Manajemen PBJ';
+
+    protected static ?string $label = 'Konsolidasi Paket Perencanaan';
 
     public static function form(Form $form): Form
     {

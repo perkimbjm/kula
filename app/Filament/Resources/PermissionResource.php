@@ -21,6 +21,8 @@ class PermissionResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
+    protected static ?string $label = 'Izin Akses';
+
     public static function form(Form $form): Form
     {
         return $form

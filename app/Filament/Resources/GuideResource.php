@@ -21,6 +21,8 @@ class GuideResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Konten';
 
+    protected static ?string $label = 'Panduan';
+
     public static function form(Form $form): Form
     {
         return $form

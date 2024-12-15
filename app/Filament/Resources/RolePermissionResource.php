@@ -21,6 +21,8 @@ class RolePermissionResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
+    protected static ?string $label = 'Hak Akses Role';
+
     public static function form(Form $form): Form
     {
         return $form

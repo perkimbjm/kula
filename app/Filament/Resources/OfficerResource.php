@@ -21,6 +21,8 @@ class OfficerResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
+    protected static ?string $label = 'Pegawai / Staf';
+
     public static function form(Form $form): Form
     {
         return $form

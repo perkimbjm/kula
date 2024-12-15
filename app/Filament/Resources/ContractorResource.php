@@ -21,6 +21,8 @@ class ContractorResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
+    protected static ?string $label = 'Kontraktor';
+
     public static function form(Form $form): Form
     {
         return $form

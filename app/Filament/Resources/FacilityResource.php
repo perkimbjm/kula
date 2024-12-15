@@ -21,6 +21,8 @@ class FacilityResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
+    protected static ?string $label = 'PSU';
+
     public static function form(Form $form): Form
     {
         return $form

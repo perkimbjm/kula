@@ -22,6 +22,8 @@ class WorkResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
+    protected static ?string $label = 'Kemajuan Pekerjaan Fisik';
+
     public static function form(Form $form): Form
     {
         return $form

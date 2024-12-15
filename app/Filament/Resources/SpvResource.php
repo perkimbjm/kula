@@ -21,6 +21,8 @@ class SpvResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
+    protected static ?string $label = 'Paket Pengawasan';
+
     public static function form(Form $form): Form
     {
         return $form

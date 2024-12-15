@@ -21,6 +21,8 @@ class ProcurementOfficerResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
+    protected static ?string $label = 'Pejabat Pengadaan';
+
     public static function form(Form $form): Form
     {
         return $form
