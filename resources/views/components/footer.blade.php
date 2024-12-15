@@ -21,7 +21,7 @@
                         <nav class="space-y-2">
                             <a href="https://balangankab.go.id/" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Portal Pemerintah Kab. Balangan</a>
                             <a href="https://sippn.menpan.go.id/instansi/172002/pemerintah-kab-balangan/dinas-pekerjaan-umum--penataan-ruang-perumahan-rakyat-dan-kawasan-permukiman" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Pelayanan Publik</a>
-                            <a href="https://sibedah-seru.web.id" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Bedah Rumah</a>
+                            <a href="https://sibedahseru.web.id" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Bedah Rumah</a>
                             <a href="https://docs.google.com/forms/d/e/1FAIpQLSfs7C3ip2ZRrQlJPuKfXI-J0U-BOy2z70ztrM8mAi--DJ1_ow/viewform" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Smart RTLH</a>
                             <a href="#" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Paman Latif</a>                            
                             <a href="http://geoportal.balangankab.go.id/WebPortal/index.html" target="_blank" class="block text-gray-600 hover:text-yellow-400 transition-colors duration-200">Geoportal Balangan</a>

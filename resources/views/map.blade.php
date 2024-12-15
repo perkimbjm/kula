@@ -3,6 +3,7 @@
 @push('after-style')
 <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet" />
 <x-leaflet></x-leaflet>
+<link rel="stylesheet" href="/css/map/markerCluster.css">
 <style>
   .leaflet-control-layers-selector {
     top: 0;
@@ -80,6 +81,7 @@
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
   <script src="{{ asset('js/map/Control.Geocoder.js') }}"></script>
   <script src="{{ asset('/js/map/leaflet.groupedlayercontrol.js') }}"></script>
+  <script src="{{ asset('/js/map/leaflet.markercluster141.js') }}"></script>
   <script src="{{ asset('js/map/base.js') }}"></script>
   <script src="{{ asset('js/map/core.js') }}"></script>
 @endpush
