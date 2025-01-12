@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SurveyPhotoResource\Pages;
-use App\Filament\Resources\SurveyPhotoResource\RelationManagers;
-use App\Models\SurveyPhoto;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Survey;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\SurveyPhoto;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SurveyPhotoResource\Pages;
+use App\Filament\Resources\SurveyPhotoResource\RelationManagers;
 
 class SurveyPhotoResource extends Resource
 {
     protected static ?string $model = SurveyPhoto::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
@@ -28,12 +29,15 @@ class SurveyPhotoResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('survey_id')
+                    ->label('Survei')
                     ->relationship('survey', 'name')
                     ->required(),
                 Forms\Components\Textarea::make('description')
+                    ->label('Penjelasan Foto')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('photo_url')
+                    ->label('Upload Foto')
                     ->required()
                     ->image()
                     ->directory('survei')
@@ -44,16 +48,19 @@ class SurveyPhotoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(Survey::with('surveyPhotos')->select('id', 'name')->distinct())
             ->columns([
-                Tables\Columns\TextColumn::make('survey.name')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Survei')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('photo_url'),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\ImageColumn::make('surveyPhotos.photo_url')
+                    ->label('Foto Survei')
+                    ->size(350, 180),
+                Tables\Columns\TextColumn::make('surveyPhotos.created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('surveyPhotos.updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -63,6 +70,7 @@ class SurveyPhotoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('ticket_responses', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('ticket_id');
-            $table->foreign('ticket_id')->references('id')->on('tickets')->onDelete('cascade');
+            $table->foreign('ticket_id')->constrained('tickets');
             $table->foreignId('admin_id')->constrained('users');
             $table->text('issue');
             $table->text('response');

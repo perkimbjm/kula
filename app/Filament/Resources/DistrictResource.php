@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DistrictResource\Pages;
-use App\Filament\Resources\DistrictResource\RelationManagers;
-use App\Models\District;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\District;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DistrictResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\DistrictResource\RelationManagers;
 
 class DistrictResource extends Resource
 {
     protected static ?string $model = District::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
 
     protected static ?string $navigationGroup = 'Manajemen Lokasi';
 
@@ -37,6 +38,11 @@ class DistrictResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->label('Nama Kecamatan')
+                    ->debounce(1000)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $set('slug', Str::slug($state));
+                    })
                     ->maxLength(255),
                 Forms\Components\TextInput::make('slug')
                     ->required()

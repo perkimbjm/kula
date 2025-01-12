@@ -27,6 +27,7 @@ class Ticket extends Model
         'lat',
         'lng',
         'status',
+        'ticket_number'
     ];
 
     /**
@@ -58,5 +59,30 @@ class Ticket extends Model
     public function ticketResponses(): HasMany
     {
         return $this->hasMany(TicketResponse::class);
+    }
+
+    public function feedback()
+    {
+        return $this->hasMany(TicketFeedback::class);
+    }
+
+   
+    public function latestResponse()
+    {
+        return $this->ticketResponses()->latest()->first();
+    }
+
+    // Atribut untuk mendapatkan response
+    public function getLatestResponseAttribute()
+    {
+        return $this->latestResponse() ? $this->latestResponse()->response : 'Belum ada tanggapan';
+    }
+        
+    protected static function booted()
+    {
+        static::creating(function ($ticket) {
+            // Buat short_id saat tiket dibuat
+            $ticket->ticket_number = substr($ticket->id, 0, 8); // Ambil 8 karakter pertama dari UUID
+        });
     }
 }

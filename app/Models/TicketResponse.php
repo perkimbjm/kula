@@ -22,6 +22,7 @@ class TicketResponse extends Model
         'issue',
         'response',
         'user_id',
+        'ticket_number_resp'
     ];
 
     /**
@@ -48,4 +49,5 @@ class TicketResponse extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }

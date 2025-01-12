@@ -32,7 +32,7 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
+            'root' => storage_path('app'),
             'serve' => true,
             'throw' => false,
         ],
@@ -56,6 +56,15 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+
+
+        'exports' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/exports'),
+            'url' => env('APP_URL').'/storage/exports',
+            'visibility' => 'public',
+        ],
+
 
     ],
 

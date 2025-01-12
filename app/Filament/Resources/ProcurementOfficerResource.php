@@ -17,7 +17,7 @@ class ProcurementOfficerResource extends Resource
 {
     protected static ?string $model = ProcurementOfficer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -28,12 +28,15 @@ class ProcurementOfficerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nip')
+                    ->label('NIP')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('grade')
+                    ->label('Golongan')
                     ->maxLength(255),
             ]);
     }
@@ -43,10 +46,13 @@ class ProcurementOfficerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nip')
+                    ->label('NIP')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('grade')
+                    ->label('Golongan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

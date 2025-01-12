@@ -538,6 +538,31 @@ map.on("overlayremove", function (e) {
     }
 });
 
+function addLayerToControl(layer, name) {
+    if (layer && name && layerControl) {
+        if (layer._leaflet_id) {
+            groupedOverlays.IMPORT[name] = layer;
+
+            layerControl.remove();
+
+            layerControl = L.control.groupedLayers(
+                baseLayers,
+                groupedOverlays,
+                {
+                    collapsed: document.body.clientWidth <= 1367,
+                    exclusiveGroups: [],
+                }
+            );
+
+            layerControl.addTo(map);
+        } else {
+            console.error(`Layer "${name}" tidak memiliki _leaflet_id yang valid.`);
+        }
+    } else {
+        console.error(`Gagal menambahkan layer "${name}" ke layer control: Parameter tidak valid.`);
+    }
+}
+
 let groupedOverlays = {
     "<b>BATAS ADMINISTRASI</b>": {
         "Kecamatan ": kecamatan,
@@ -550,6 +575,7 @@ let groupedOverlays = {
         "Permukiman Kumuh": kumuh,
         "Rumah Tidak Layak Huni": rtlhCluster,
     },
+    IMPORT: {},
 };
 
 let baseLayers = {
@@ -595,3 +621,226 @@ let onClicked = function (e) {
 };
 
 map.on("contextmenu", onClicked);
+
+function popUp(geo) {
+    map.fitBounds(geo.getBounds());
+    geo.eachLayer(function (layer) {
+        let properties = layer.feature.properties;
+        let popupContent =
+            "<div class='popup-content'><table class='table-auto w-full border-collapse border border-gray-300'>";
+        Object.entries(properties).forEach(([key, value]) => {
+            popupContent += `<tr><th class='text-left border border-gray-300 p-2'>${key}</th><td class='border border-gray-300 p-2'>${value}</td></tr>`;
+        });
+        popupContent += "</table></div>";
+        layer.bindPopup(popupContent);
+    });
+}
+
+let geo;
+
+
+function geoJsonData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        const geoJsonLayer = L.layerGroup();
+
+        const geo = omnivore
+            .geojson(reader.result)
+            .on("ready", function () {
+                this.eachLayer(function (layer) {
+                    geoJsonLayer.addLayer(layer);
+                });
+                popUp(this);
+            })
+            .addTo(geoJsonLayer);
+
+        geoJsonLayer.addTo(map);
+
+        const fileName = file.name.split(".").slice(0, -1).join(".");
+
+        addLayerToControl(geoJsonLayer, fileName);
+    };
+    reader.readAsDataURL(file);
+}
+
+function gpxData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        const gpxLayer = L.layerGroup();
+        const geo = omnivore
+            .gpx(reader.result)
+            .on("ready", function () {
+                popUp(geo);
+            })
+            .addTo(gpxLayer);
+        gpxLayer.addTo(map);
+        const fileName = file.name.split(".").slice(0, -1).join(".");
+        groupedOverlays.IMPORT[fileName] = gpxLayer;
+
+        layerControl.remove();
+        layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+            collapsed: document.body.clientWidth <= 1367,
+        });
+        layerControl.addTo(map);
+    };
+    reader.readAsDataURL(file);
+}
+
+function csvData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        const csvLayer = L.layerGroup();
+        const geo = omnivore.csv.parse(reader.result).addTo(csvLayer);
+        popUp(geo);
+        csvLayer.addTo(map);
+        const fileName = file.name.split(".").slice(0, -1).join(".");
+        groupedOverlays.IMPORT[fileName] = csvLayer;
+
+        layerControl.remove();
+        layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+            collapsed: document.body.clientWidth <= 1367,
+        });
+        layerControl.addTo(map);
+    };
+    reader.readAsText(file);
+}
+
+function kmlData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        const kmlLayer = L.layerGroup();
+        const geo = omnivore.kml.parse(reader.result).addTo(kmlLayer);
+        popUp(geo);
+        kmlLayer.addTo(map);
+        const fileName = file.name.split(".").slice(0, -1).join(".");
+        groupedOverlays.IMPORT[fileName] = kmlLayer;
+
+        layerControl.remove();
+        layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+            collapsed: document.body.clientWidth <= 1367,
+        });
+        layerControl.addTo(map);
+    };
+    reader.readAsText(file);
+}
+
+function wktData(file) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        const wktLayer = L.layerGroup();
+        const geo = omnivore.wkt.parse(reader.result).addTo(wktLayer);
+        popUp(geo);
+        wktLayer.addTo(map);
+        const fileName = file.name.split(".").slice(0, -1).join(".");
+        groupedOverlays.IMPORT[fileName] = wktLayer;
+
+        layerControl.remove();
+        layerControl = L.control.groupedLayers(baseLayers, groupedOverlays, {
+            collapsed: document.body.clientWidth <= 1367,
+        });
+        layerControl.addTo(map);
+    };
+    reader.readAsText(file);
+}
+
+function shpData(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const buffer = e.target.result;
+        shp(buffer)
+            .then(function (geojson) {
+                const shpLayer = L.layerGroup();
+                const layer = L.geoJson(geojson, {
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties) {
+                            const keys = Object.keys(feature.properties);
+                            const values = Object.values(feature.properties);
+
+                            let popupContent =
+                                '<div class="max-h-100px max-w-87.5px overflow-auto">' +
+                                '<table class="table-auto w-full border-collapse border border-gray-300">';
+
+                            popupContent += "<tr>";
+                            keys.forEach((key) => {
+                                popupContent += `<th class="text-left border border-gray-300 p-2 overflow-auto">${key}</th>`;
+                            });
+                            popupContent += "</tr>";
+
+                            popupContent += "<tr>";
+                            values.forEach((value) => {
+                                popupContent += `<td class="border border-gray-300 p-2 overflow-auto">${value}</td>`;
+                            });
+                            popupContent += "</tr>";
+
+                            popupContent += "</table></div>";
+                            layer.bindPopup(popupContent);
+                        }
+                    },
+                });
+                shpLayer.addLayer(layer);
+                shpLayer.addTo(map);
+                const fileName = file.name.split(".").slice(0, -1).join(".");
+                groupedOverlays.IMPORT[fileName] = shpLayer;
+
+                layerControl.remove();
+                layerControl = L.control.groupedLayers(
+                    baseLayers,
+                    groupedOverlays,
+                    {
+                        collapsed: document.body.clientWidth <= 1367,
+                    }
+                );
+                layerControl.addTo(map);
+                map.fitBounds(layer.getBounds());
+            })
+            .catch(function (error) {
+                console.error("Error loading shapefile:", error);
+            });
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// Add Vector Layers
+function vectorData() {
+    let inputNode = document.createElement("input");
+    inputNode.setAttribute("type", "file");
+    inputNode.setAttribute("id", "leaflet-draw-shapefile-selector");
+    inputNode.setAttribute("accept", ".geojson,.gpx,.csv,.kml,.wkt,.zip");
+
+    inputNode.addEventListener("change", function (e) {
+        let files = inputNode.files;
+        let file = files[0];
+        let parts = file.name.split(".");
+        let ext = parts[parts.length - 1];
+
+        if (ext.toLowerCase() == "geojson") {
+            geoJsonData(file);
+        } else if (ext.toLowerCase() == "gpx") {
+            gpxData(file);
+        } else if (ext.toLowerCase() == "csv") {
+            csvData(file);
+        } else if (ext.toLowerCase() == "kml") {
+            kmlData(file);
+        } else if (ext.toLowerCase() == "wkt") {
+            wktData(file);
+        } else if (ext.toLowerCase() == "zip") {
+            shpData(file);
+        }
+    });
+    inputNode.click();
+}
+
+if (L && L.easyButton) {
+    L.easyButton({
+        states: [
+            {
+                stateName: "upload",
+                icon: "fa fa-upload fa-lg",
+                title: "Add Layers (shapefile, geojson, gpx, csv, kml, wkt)",
+                onClick: function (btn, map) {
+                    vectorData();
+                },
+            },
+        ],
+    }).addTo(map);
+}

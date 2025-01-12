@@ -17,7 +17,7 @@ class OfficerResource extends Resource
 {
     protected static ?string $model = Officer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
@@ -28,13 +28,15 @@ class OfficerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nip')
+                    ->label('NIP')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(18),
                 Forms\Components\TextInput::make('grade')
-                    ->maxLength(255),
+                    ->label('Golongan'),
             ]);
     }
 
@@ -43,10 +45,13 @@ class OfficerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nip')
+                    ->label('NIP')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('grade')
+                    ->label('Golongan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

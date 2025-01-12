@@ -17,7 +17,7 @@ class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-key';
 
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
@@ -28,6 +28,7 @@ class PermissionResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Izin Akses')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -38,6 +39,7 @@ class PermissionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Izin Akses')
                     ->searchable(),
             ])
             ->filters([

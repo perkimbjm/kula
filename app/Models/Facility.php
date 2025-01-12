@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Officer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Facility extends Model
 {
@@ -86,5 +87,20 @@ class Facility extends Model
     public function consultant(): BelongsTo
     {
         return $this->belongsTo(Consultant::class);
+    }
+
+    public function officers()
+    {
+        return $this->belongsToMany(Officer::class);
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($facility) {
+            // Mengambil nama-nama officer yang dipilih dan menyimpannya ke field team
+            if ($facility->officers()->exists()) {
+                $facility->team = $facility->officers->pluck('name')->toArray();
+            }
+        });
     }
 }

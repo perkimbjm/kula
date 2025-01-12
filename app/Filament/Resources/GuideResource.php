@@ -17,7 +17,7 @@ class GuideResource extends Resource
 {
     protected static ?string $model = Guide::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationGroup = 'Manajemen Konten';
 
@@ -28,9 +28,11 @@ class GuideResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('type')
+                    ->label('Jenis')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('guide_url')
+                    ->label('Link Panduan')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('thumbnail')
@@ -39,6 +41,7 @@ class GuideResource extends Resource
                     ->directory('panduan')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
+                    ->label('Penjelasan Singkat')
                     ->required()
                     ->columnSpanFull()
             ]);
@@ -49,9 +52,13 @@ class GuideResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('type')
+                    ->label('Jenis')
                     ->searchable(),
-                Tables\Columns\ImagetColumn::make('thumbnail'),
+                Tables\Columns\ImageColumn::make('thumbnail')
+                    ->label('Thumbnail')
+                    ->size(150, 100),
                 Tables\Columns\TextColumn::make('guide_url')
+                    ->label('Link Panduan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -68,6 +75,7 @@ class GuideResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

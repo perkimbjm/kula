@@ -17,7 +17,7 @@ class InformationResource extends Resource
 {
     protected static ?string $model = Information::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?string $navigationGroup = 'Manajemen Konten';
 
@@ -51,7 +51,8 @@ class InformationResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('info_url')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('thumbnail'),
+                Tables\Columns\ImageColumn::make('thumbnail')
+                    ->size(150, 100),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -67,6 +68,7 @@ class InformationResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

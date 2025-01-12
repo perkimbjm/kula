@@ -24,7 +24,7 @@ class Consultant extends Model
         'npwp',
         'leader',
         'position',
-        'slug',
+        'bank',
         'account_number',
         'account_holder',
         'header_scan',

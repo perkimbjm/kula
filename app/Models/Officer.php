@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Facility;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Officer extends Model
 {
@@ -28,4 +29,9 @@ class Officer extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function facilities()
+    {
+        return $this->belongsToMany(Facility::class);
+    }
 }

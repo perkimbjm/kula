@@ -79,9 +79,12 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js" charset="utf-8"></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+  <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js"></script>
+  <script src="{{ asset('js/map/shp.js') }}"></script>
+  <script src="{{ asset('js/map/leaflet.shapefile.js') }}"></script>
   <script src="{{ asset('js/map/Control.Geocoder.js') }}"></script>
-  <script src="{{ asset('/js/map/leaflet.groupedlayercontrol.js') }}"></script>
-  <script src="{{ asset('/js/map/leaflet.markercluster141.js') }}"></script>
+  <script src="{{ asset('js/map/leaflet.groupedlayercontrol.js') }}"></script>
+  <script src="{{ asset('js/map/leaflet.markercluster141.js') }}"></script>
   <script src="{{ asset('js/map/base.js') }}"></script>
   <script src="{{ asset('js/map/core.js') }}"></script>
 @endpush

@@ -35,4 +35,5 @@ class SurveyPhoto extends Model
     {
         return $this->belongsTo(Survey::class);
     }
+
 }

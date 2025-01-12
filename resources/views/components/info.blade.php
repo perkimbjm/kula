@@ -2,21 +2,17 @@
     <div class="grid md:grid-cols-2 gap-12 items-center">
         <div>
             <span class="text-purple-300 mb-2 inline-block">About us</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
-                Our Journey, Vision, And Values
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-6">
+                Dinas Pekerjaan Umum, Penataan Ruang, Perumahan Rakyat, dan Kawasan Permukiman Kab. Balangan
             </h2>
-            <p class="text-purple-100">
-                Lorem Ipsum Is Simply Dummy Text Of The Printing And Typesetting Industry. Lorem Ipsum Has Been The Industry's
-            </p>
-            <div class="mt-4 inline-flex items-center bg-purple-500/10 px-4 py-2 rounded-full">
-                <span class="text-purple-200 mr-2">★★★★★</span>
-                <span class="text-white">5 Star Reviews</span>
-            </div>
+            <quote class="text-purple-100">
+                " Negara bertanggung jawab melindungi segenap bangsa Indonesia melalui penyelenggaraan perumahan dan kawasan permukiman agar masyarakat mampu bertempat tinggal serta menghuni rumah yang layak dan terjangkau di dalam lingkungan yang sehat, aman, harmonis, dan berkelanjutan di seluruh wilayah Indonesia." (UU no. 1 tahun 2011)
+            </quote>
         </div>
-        <div class="bg-purple-400/20 rounded-3xl p-4 backdrop-blur-sm">
-            <img src="{{ asset('images/placeholder.svg?height=400&width=600') }}" 
+        <div class="px-2">
+            <img src="{{ asset('img/tugu.png') }}" 
                  alt="Team collaboration" 
-                 class="w-full rounded-2xl object-cover">
+                 class="w-full object-cover">
         </div>
     </div>
 

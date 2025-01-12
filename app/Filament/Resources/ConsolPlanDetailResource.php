@@ -17,7 +17,7 @@ class ConsolPlanDetailResource extends Resource
 {
     protected static ?string $model = ConsolPlanDetail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-folder-plus';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -28,16 +28,21 @@ class ConsolPlanDetailResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('consolidation_id')
+                    ->label('ID')
                     ->relationship('consolidation', 'id')
                     ->required(),
                 Forms\Components\TextInput::make('budget')
+                    ->label('Pagu')
                     ->numeric(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nego_value')
+                    ->label('Harga Nego')
                     ->numeric(),
                 Forms\Components\Select::make('consol_plan_id')
+                    ->label('ID Konsolidasi Perencanaan')
                     ->relationship('consolPlan', 'id')
                     ->required(),
             ]);
@@ -51,14 +56,18 @@ class ConsolPlanDetailResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('budget')
+                    ->label('Pagu')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nego_value')
+                    ->label('Harga Nego')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('consolPlan.id')
+                    ->label('ID Konsolidasi Perencanaan')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -75,6 +84,8 @@ class ConsolPlanDetailResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

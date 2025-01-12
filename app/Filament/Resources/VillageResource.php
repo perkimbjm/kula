@@ -8,6 +8,7 @@ use App\Models\Village;
 use App\Models\District;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\VillageResource\Pages;
@@ -38,6 +39,11 @@ class VillageResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->label('Nama Kelurahan / Desa')
+                    ->debounce(1000)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $set('slug', Str::slug($state));
+                    })
                     ->maxLength(255),
                 Forms\Components\Select::make('district_id')
                     ->label('Kecamatan')

@@ -17,7 +17,7 @@ class ConsultantResource extends Resource
 {
     protected static ?string $model = Consultant::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-identification';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -26,49 +26,66 @@ class ConsultantResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('akta')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('founding_date')
-                    ->required(),
-                Forms\Components\TextInput::make('notary')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('npwp')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('leader')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('position')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('account_number')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('account_holder')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('header_scan')
-                    ->image()
-                    ->directory('konsultan/kop'),
-                Forms\Components\FileUpload::make('account_scan')
-                    ->image()
-                    ->directory('konsultan/rek'),
-                Forms\Components\FileUpload::make('npwp_scan')
-                    ->image()
-                    ->directory('konsultan/npwp'),
-            ]);
+        ->schema([
+            Forms\Components\TextInput::make('name')
+                ->label('Penyedia Jasa')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('akta')
+                ->label('No. Akta Terakhir')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\DatePicker::make('founding_date')
+                ->label('Tanggal')
+                ->required(),
+            Forms\Components\TextInput::make('notary')
+                ->label('Notaris')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('address')
+                ->label('Alamat Penyedia')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('npwp')
+                ->label('NPWP')
+                ->required()
+                ->maxLength(30),
+            Forms\Components\TextInput::make('leader')
+                ->label('Nama Direktur')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('position')
+                ->label('Jabatan')
+                ->required()
+                ->maxLength(30),
+            Forms\Components\TextInput::make('bank')
+                ->label('Bank')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('account_number')
+                ->label('Nomor Rekening')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\TextInput::make('account_holder')
+                ->label('Nama Nasabah')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\FileUpload::make('header_scan')
+                ->label('Kop Surat')
+                ->acceptedFileTypes(['image/*', 'application/pdf'])
+                ->directory('konsultan/kop')
+                ->columnSpanFull(),
+            Forms\Components\FileUpload::make('account_scan')
+                ->label('Scan Rekening')
+                ->acceptedFileTypes(['image/*', 'application/pdf'])
+                ->directory('konsultan/rek')
+                ->columnSpanFull(),
+            Forms\Components\FileUpload::make('npwp_scan')
+                ->label('Scan NPWP')
+                ->acceptedFileTypes(['image/*', 'application/pdf'])
+                ->directory('konsultan/npwp')
+                ->columnSpanFull(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -76,33 +93,36 @@ class ConsultantResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Penyedia Jasa')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('akta')
-                    ->searchable(),
+                    ->label('No. Akta Terakhir'),
                 Tables\Columns\TextColumn::make('founding_date')
-                    ->date()
-                    ->sortable(),
+                    ->label('Tanggal')
+                    ->date(),
                 Tables\Columns\TextColumn::make('notary')
+                    ->label('Notaris')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->label('Alamat Penyedia'),
                 Tables\Columns\TextColumn::make('npwp')
+                    ->label('NPWP')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('leader')
+                    ->label('Nama Direktur')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('position')
+                    ->label('Jabatan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('bank')
+                    ->label('Bank')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('account_number')
+                    ->label('Nomor Rekening')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('account_holder')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('header_scan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('account_scan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('npwp_scan')
+                    ->label('Nama Nasabah')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -119,6 +139,7 @@ class ConsultantResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

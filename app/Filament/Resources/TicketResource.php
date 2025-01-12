@@ -7,11 +7,13 @@ use Filament\Tables;
 use App\Models\Ticket;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use App\Models\District;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Enums\TicketStatus;
 use Filament\Resources\Resource;
 use Dotswan\MapPicker\Fields\Map;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\TicketResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -21,7 +23,7 @@ class TicketResource extends Resource
 {
     protected static ?string $model = Ticket::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
     protected static ?string $navigationGroup = 'Manajemen Usulan / Pengaduan';
 
@@ -31,22 +33,34 @@ class TicketResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
+                Forms\Components\Hidden::make('user_id')
+                    ->default(Auth::id())
                     ->required(),
                 Forms\Components\TextInput::make('type')
+                    ->label('Jenis Pengaduan/Usulan')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('issue')
+                Forms\Components\MarkDownEditor::make('issue')
+                    ->label('Permasalahan')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('district_id')
+                    ->label('Kecamatan')
                     ->relationship('district', 'name')
-                    ->required(),
+                    ->required()
+                    ->reactive(),                
                 Forms\Components\Select::make('village_id')
+                    ->label('Kelurahan / Desa')
                     ->relationship('village', 'name')
+                    ->options(function ($get) {
+                        $districtId = $get('district_id');
+                        return $districtId 
+                            ? \App\Models\District::find($districtId)->villages->pluck('name', 'id') 
+                            : [];
+                    })
                     ->required(),
                 Forms\Components\FileUpload::make('photo_url')
+                    ->label('Foto/Gambar Bukti Dukung')
                     ->image()  
                     ->directory('aduan')
                     ->columnSpanFull(),
@@ -76,7 +90,7 @@ class TicketResource extends Resource
                             }),
                     ]),
                 Map::make('location')
-                    ->label('Location')
+                    ->label('Lokasi yang Dilaporkan')
                     ->columnSpanFull()
                     ->defaultLocation(latitude: -2.3357594, longitude: 115.460096)
                     ->reactive()
@@ -117,21 +131,26 @@ class TicketResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
+                Tables\Columns\TextColumn::make('ticket_number')
+                    ->label('ID Ticket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->label('Jenis Pengaduan/Usulan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('district.name')
+                    ->label('Kecamatan')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('village.name')
+                    ->label('Kelurahan / Desa')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('photo_url'),
+                Tables\Columns\ImageColumn::make('photo_url')
+                    ->label('Foto/Gambar Bukti Dukung')
+                    ->size(150, 100),
                 Tables\Columns\TextColumn::make('lat')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('lng')
@@ -152,7 +171,7 @@ class TicketResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

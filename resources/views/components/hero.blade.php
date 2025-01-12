@@ -12,7 +12,7 @@
         <div class="rounded-3xl p-2">
             <img src="{{ asset('img/hero-image.png') }}" 
                  alt="Pelayanan Publik" 
-                 class="w-full rounded-2xl object-cover">
+                 class="w-full rounded-xl object-cover">
         </div>
     </div>
 </section>

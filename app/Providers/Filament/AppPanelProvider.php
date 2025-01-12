@@ -17,6 +17,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 
 class AppPanelProvider extends PanelProvider
 {
@@ -30,6 +31,8 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
             ])
+            ->navigationGroups(['Manajemen Proyek', 'Manajemen PBJ', 'Manajemen Usulan / Pengaduan', 'Manajemen Pengguna', 'Manajemen Lokasi', 'Manajemen Konten'])
+            ->viteTheme('resources/css/filament/app/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -55,6 +58,17 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                \Hydrat\TableLayoutToggle\TableLayoutTogglePlugin::make([
+                    'defaultLayout' => 'grid',
+                    'persistLayoutInLocalStorage' => true,
+                    'shareLayoutBetweenPages' => false,
+                    'displayToggleAction' => true,
+                    'toggleActionHook' => 'tables::toolbar.search.after',
+                    'listLayoutButtonIcon' => 'heroicon-o-list-bullet',
+                    'gridLayoutButtonIcon' => 'heroicon-o-squares-2x2'
+                ])
             ]);
     }
 }

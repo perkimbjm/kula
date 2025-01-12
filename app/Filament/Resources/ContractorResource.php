@@ -17,7 +17,7 @@ class ContractorResource extends Resource
 {
     protected static ?string $model = Contractor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -28,46 +28,63 @@ class ContractorResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Penyedia Jasa')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('akta')
+                    ->label('No. Akta Terakhir')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('founding_date')
+                    ->label('Tanggal')
                     ->required(),
                 Forms\Components\TextInput::make('notary')
+                    ->label('Notaris')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('address')
+                    ->label('Alamat Penyedia')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('npwp')
+                    ->label('NPWP')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(30),
                 Forms\Components\TextInput::make('leader')
+                    ->label('Nama Direktur')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('position')
+                    ->label('Jabatan')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('slug')
+                    ->maxLength(30),
+                Forms\Components\TextInput::make('bank')
+                    ->label('Bank')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('account_number')
+                    ->label('Nomor Rekening')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('account_holder')
+                    ->label('Nama Nasabah')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('header_scan')
-                    ->image()
-                    ->directory('kontraktor/kop'),
+                    ->label('Kop Surat')
+                    ->acceptedFileTypes(['image/*', 'application/pdf'])
+                    ->directory('kontraktor/kop')
+                    ->columnSpanFull(),
                 Forms\Components\FileUpload::make('account_scan')
-                    ->image()
-                    ->directory('kontraktor/rek'),
+                    ->label('Scan Rekening')
+                    ->acceptedFileTypes(['image/*', 'application/pdf'])
+                    ->directory('kontraktor/rek')
+                    ->columnSpanFull(),
                 Forms\Components\FileUpload::make('npwp_scan')
-                    ->image()
-                    ->directory('kontraktor/npwp'),
+                    ->label('Scan NPWP')
+                    ->acceptedFileTypes(['image/*', 'application/pdf'])
+                    ->directory('kontraktor/npwp')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -76,33 +93,36 @@ class ContractorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Penyedia Jasa')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('akta')
-                    ->searchable(),
+                    ->label('No. Akta Terakhir'),
                 Tables\Columns\TextColumn::make('founding_date')
-                    ->date()
-                    ->sortable(),
+                    ->label('Tanggal')
+                    ->date(),
                 Tables\Columns\TextColumn::make('notary')
+                    ->label('Notaris')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->label('Alamat Penyedia'),
                 Tables\Columns\TextColumn::make('npwp')
+                    ->label('NPWP')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('leader')
+                    ->label('Nama Direktur')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('position')
+                    ->label('Jabatan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                Tables\Columns\TextColumn::make('bank')
+                    ->label('Bank')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('account_number')
+                    ->label('Nomor Rekening')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('account_holder')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('header_scan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('account_scan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('npwp_scan')
+                    ->label('Nama Nasabah')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -119,6 +139,7 @@ class ContractorResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

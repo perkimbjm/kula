@@ -20,7 +20,7 @@ class SurveyResource extends Resource
 {
     protected static ?string $model = Survey::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
@@ -31,27 +31,35 @@ class SurveyResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Paket')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('supervisor')
+                    ->label('Pendamping')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('district_id')
+                    ->label('Kecamatan')
                     ->relationship('district', 'name')
                     ->required(),
                 Forms\Components\Select::make('village_id')
+                    ->label('Kelurahan / Desa')
                     ->relationship('village', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('length')
+                    ->label('Panjang (m)')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('type')
+                    ->label('Jenis Usulan')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('program')
+                    ->label('Jenis Kegiatan')
                     ->required()
-                    ->maxLength(255),
-                    Forms\Components\Grid::make(2)
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Forms\Components\Grid::make(2)
                     ->schema([
                     Forms\Components\TextInput::make('lat')
                             ->label('lat')
@@ -77,7 +85,7 @@ class SurveyResource extends Resource
                             }),
                     ]),
                 Map::make('location')
-                    ->label('Location')
+                    ->label('Lokasi')
                     ->columnSpanFull()
                     ->defaultLocation(latitude: -2.3357594, longitude: 115.460096)
                     ->reactive()
@@ -107,6 +115,7 @@ class SurveyResource extends Resource
                     ->detectRetina()
                     ->showMyLocationButton(),
                 Forms\Components\Textarea::make('note')
+                    ->label('Catatan')
                     ->columnSpanFull(),
             ]);
     }
@@ -116,26 +125,35 @@ class SurveyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('supervisor')
+                    ->label('Pendamping')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('district.name')
+                    ->label('Kecamatan')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('village.name')
+                    ->label('Kelurahan / Desa')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('length')
+                    ->label('Panjang (m)')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->label('Jenis Usulan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('program')
+                    ->label('Jenis Kegiatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('lat')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('lng')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('note')
+                    ->label('Catatan'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -151,6 +169,7 @@ class SurveyResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

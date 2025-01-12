@@ -17,7 +17,7 @@ class ConsolSpvDetailResource extends Resource
 {
     protected static ?string $model = ConsolSpvDetail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-folder-plus';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -28,16 +28,21 @@ class ConsolSpvDetailResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('consolidation_id')
+                    ->label('ID')
                     ->relationship('consolidation', 'id')
                     ->required(),
                 Forms\Components\TextInput::make('budget')
+                    ->label('Pagu')
                     ->numeric(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Paket')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nego_value')
+                    ->label('Harga Nego')
                     ->numeric(),
                 Forms\Components\Select::make('consol_spv_id')
+                    ->label('ID Konsolidasi Pengawasan')
                     ->relationship('consolSpv', 'id')
                     ->required(),
             ]);
@@ -51,14 +56,18 @@ class ConsolSpvDetailResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('budget')
+                    ->label('Pagu')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nego_value')
+                    ->label('Harga Nego')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('consolSpv.id')
+                    ->label('ID Konsolidasi Pengawasan')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -75,6 +84,8 @@ class ConsolSpvDetailResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

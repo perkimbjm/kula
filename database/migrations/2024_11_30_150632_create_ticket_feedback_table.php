@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::create('ticket_feedback', function (Blueprint $table) {
             $table->uuid('id');
-            $table->foreignUuid('ticket_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('ticket_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->text('feedback');
             $table->integer('rating');

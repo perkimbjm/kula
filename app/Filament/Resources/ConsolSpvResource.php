@@ -17,7 +17,7 @@ class ConsolSpvResource extends Resource
 {
     protected static ?string $model = ConsolSpv::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-folder';
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
@@ -28,39 +28,55 @@ class ConsolSpvResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('year')
+                    ->label('Tahun')
                     ->required()
                     ->numeric(),
                 Forms\Components\Select::make('procurement_officer_id')
+                    ->label('Pejabat Pengadaan')
                     ->relationship('procurementOfficer', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('bid_value')
+                    ->label('Nilai Penawaran')
                     ->numeric(),
                 Forms\Components\TextInput::make('correction_value')
+                    ->label('Koreksi Aritmatik')
                     ->numeric(),
                 Forms\Components\TextInput::make('nego_value')
+                    ->label('Harga Nego')
                     ->numeric(),
                 Forms\Components\Select::make('consultant_id')
+                    ->label('Konsultan')
                     ->relationship('consultant', 'name')
+                    ->searchable()
                     ->required(),
                 Forms\Components\DatePicker::make('invite_date')
+                    ->label('Tanggal Undangan')
                     ->required(),
                 Forms\Components\DatePicker::make('evaluation_date')
+                    ->label('Tanggal Evaluasi')
                     ->required(),
                 Forms\Components\DatePicker::make('nego_date')
+                    ->label('Tanggal Penawaran')
                     ->required(),
                 Forms\Components\DatePicker::make('BAHPL_date')
+                    ->label('Tanggal BAHPL')
                     ->required(),
                 Forms\Components\DatePicker::make('sppbj_date')
+                    ->label('Tanggal SPPBJ')
                     ->required(),
                 Forms\Components\DatePicker::make('spk_date')
+                    ->label('Tanggal SPK')
                     ->required(),
                 Forms\Components\TextInput::make('account_type')
+                    ->label('Kode Rekening')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('program')
+                    ->label('Kegiatan')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('duration')
+                    ->label('Lama Pelaksanaan (hari kalender)')
                     ->required()
                     ->numeric(),
             ]);
@@ -71,7 +87,7 @@ class ConsolSpvResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('year')
-                    ->numeric()
+                    ->label('Tahun')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('procurementOfficer.name')
                     ->numeric()
@@ -127,6 +143,8 @@ class ConsolSpvResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

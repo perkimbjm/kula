@@ -6,9 +6,9 @@ use Filament\Support\Contracts\HasLabel;
 
 enum WorkStatus: string implements HasLabel
 {
-    case belum_kontrak = 'belum_kontrak';
-    case kontrak = 'kontrak';
-    case selesai = 'selesai';
+    case BELUM_KONTRAK = 'belum_kontrak';
+    case KONTRAK = 'kontrak';
+    case SELESAI = 'selesai';
 
     public function getLabel(): ?string
     {

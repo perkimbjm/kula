@@ -17,7 +17,7 @@ class AuditLogResource extends Resource
 {
     protected static ?string $model = AuditLog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
@@ -33,15 +33,20 @@ class AuditLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Nama Pengguna')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('action')
+                    ->label('Aktivitas')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('model_type')
+                    ->label('Model')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('model_id')
+                    ->label('ID Model')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ip_address')
+                    ->label('Alamat IP')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

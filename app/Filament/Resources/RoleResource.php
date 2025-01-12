@@ -17,7 +17,7 @@ class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';    
 
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
@@ -26,6 +26,7 @@ class RoleResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Peran')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -39,6 +40,7 @@ class RoleResource extends Resource
                     ->label('ID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Peran')
                     ->searchable(),
             ])
             ->filters([
