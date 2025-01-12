@@ -8,6 +8,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use App\Enums\WorkStatus;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
@@ -142,6 +143,7 @@ class WorkResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status Pelaksanaan')
+                    ->formatStateUsing(fn($state): string => Str::headline($state))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('paid')
                     ->label('Jumlah Terbayar')
