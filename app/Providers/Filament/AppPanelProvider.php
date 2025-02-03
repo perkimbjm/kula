@@ -24,7 +24,7 @@ use App\Filament\Pages\Auth\LoginScreenPage;
 
 class AppPanelProvider extends PanelProvider
 {
-    
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -48,8 +48,7 @@ class AppPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                WorkScoreboard::class, 
-                
+
 
             ])
             ->sidebarFullyCollapsibleOnDesktop()
