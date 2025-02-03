@@ -8,6 +8,8 @@ use App\Models\Ticket;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\TicketFeedback;
+use App\Models\TicketResponse;
+use Illuminate\Support\Carbon;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,7 +37,16 @@ class TicketFeedbackResource extends Resource
                     ->label('Nomor Tiket')
                     ->options(function (callable $get, $record) {
                         $query = Ticket::query();
-                        
+
+                        $user = Auth::user();
+
+                        // Check if the user's role_id is 2  
+                        if ($user && $user->role_id == 2) {  
+                            $query->whereHas('ticketResponses', function ($q) use ($user) {  
+                                $q->where('user_id', $user->id);  
+                            });  
+                        }  
+                                        
                         if ($record) {
                             $query->where(function ($q) use ($record) {
                                 $q->whereDoesntHave('feedback')
@@ -44,10 +55,16 @@ class TicketFeedbackResource extends Resource
                         } else {
                             $query->whereDoesntHave('feedback');
                         }
-                        
-                        return $query->get()
-                            ->pluck('ticket_number', 'id')
-                            ->toArray();
+
+                        return $query->get()  
+                        ->map(function ($ticket) {  
+                            return [  
+                                'value' => $ticket->id,  
+                                'label' => $ticket->ticket_number . ' (' . Carbon::parse($ticket->updated_at)->format('d M Y H:i') . ')'  
+                            ];  
+                        })  
+                        ->pluck('label', 'value')  
+                        ->toArray();  
                     })
                     ->required()
                     ->reactive()
@@ -95,8 +112,19 @@ class TicketFeedbackResource extends Resource
     {
         return $table
             ->query(function (Builder $query) {
-                return static::getModel()::query()
-                    ->with(['ticket', 'user']);
+                $user = Auth::user();
+                $baseQuery = static::getModel()::query()->with(['ticket', 'user']);
+                
+                if ($user->role_id === 3) { // Admin
+                    // Ambil ticket_id dari response yang dibuat oleh admin ini
+                    $ticketIds = TicketResponse::where('admin_id', $user->id)
+                        ->pluck('ticket_id');
+                    return $baseQuery->whereIn('ticket_id', $ticketIds);
+                } elseif ($user->role_id === 2) { // Warga
+                    return $baseQuery->where('user_id', $user->id);
+                }
+                
+                return $baseQuery;
             })
             ->columns([
                 Tables\Columns\TextColumn::make('ticket.ticket_number')
@@ -141,5 +169,25 @@ class TicketFeedbackResource extends Resource
         return [
             'index' => Pages\ManageTicketFeedback::route('/'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $user = Auth::user();
+        if ($user->role_id === 2) {
+            return static::getModel()::where('user_id', $user->id)->count();
+        }
+        return static::getModel()::count();
+    }
+
+    protected function getTableRecordActionUsing(): ?Closure
+    {
+        return function (TicketFeedback $record): bool {
+            $user = Auth::user();
+            if ($user->role_id === 2) {
+                return $user->id === $record->user_id;
+            }
+            return true;
+        };
     }
 }

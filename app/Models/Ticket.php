@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use League\CommonMark\CommonMarkConverter;
 
 class Ticket extends Model
 {
@@ -76,6 +77,12 @@ class Ticket extends Model
     public function getLatestResponseAttribute()
     {
         return $this->latestResponse() ? $this->latestResponse()->response : 'Belum ada tanggapan';
+    }
+
+    public function getRenderedIssueAttribute()
+    {
+        $converter = new CommonMarkConverter();
+        return $converter->convertToHtml($this->issue);
     }
         
     protected static function booted()

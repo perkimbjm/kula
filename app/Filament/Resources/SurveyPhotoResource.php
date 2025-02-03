@@ -48,19 +48,22 @@ class SurveyPhotoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Survey::with('surveyPhotos')->select('id', 'name')->distinct())
+            ->query(SurveyPhoto::query())
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('survey.name')
                     ->label('Nama Survei')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('surveyPhotos.photo_url')
+                Tables\Columns\ImageColumn::make('photo_url')
                     ->label('Foto Survei')
                     ->size(350, 180),
-                Tables\Columns\TextColumn::make('surveyPhotos.created_at')
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Penjelasan Foto')
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('surveyPhotos.updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -76,6 +79,11 @@ class SurveyPhotoResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->groups([
+                Tables\Grouping\Group::make('survey.name')
+                    ->label('Nama Survei')
+                    ->collapsible(),
             ]);
     }
 

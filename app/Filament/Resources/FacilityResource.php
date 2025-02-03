@@ -202,7 +202,7 @@ class FacilityResource extends Resource
                         ->label('Jenis Konstruksi')
                         ->maxLength(255),
                     Forms\Components\TextInput::make('spending_type')
-                        ->label('Jenis Pembayaran')
+                        ->label('Jenis Belanja')
                         ->maxLength(255),
                 ]),
         ]);
@@ -306,7 +306,7 @@ class FacilityResource extends Resource
                 }),
             Tables\Columns\TextColumn::make('team')->label('Tim PHO')->searchable(),
             Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
-            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Pembayaran')->searchable(),
+            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
             Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
 
@@ -343,7 +343,7 @@ class FacilityResource extends Resource
                 }),
             Tables\Columns\TextColumn::make('team')->label('Tim PHO')->searchable(),
             Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
-            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Pembayaran')->searchable(),
+            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
             Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
 

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Filament\Panel;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,11 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements FilamentUser
 {
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    use HasRoles, Notifiable;
     protected $fillable = [
         'name',
         'email',
@@ -37,7 +35,14 @@ class User extends Authenticatable implements FilamentUser
 
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = bcrypt($value);
+        // Cek apakah string password panjangnya 60 karakter (standar bcrypt hash)
+        // dan mulai dengan $2y$ (format bcrypt)
+        if (strlen($value) === 60 && str_starts_with($value, '$2y$')) {
+            $this->attributes['password'] = $value;
+        } else {
+            // Jika bukan hash bcrypt, maka hash dengan bcrypt
+            $this->attributes['password'] = bcrypt($value);
+        }
     }
 
     /**
@@ -73,6 +78,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return str_ends_with($this->email, '@kularakat.web.id') && $this->hasVerifiedEmail();
+        return true;
     }
+
+    public function unsetPassword()  
+    {  
+        $this->unsetRelation('password');  
+        $this->attributes['password'] = null;  
+    }  
 }

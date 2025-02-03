@@ -61,13 +61,66 @@
 .modal-dialog {
         max-height: calc(100% - 2rem);
         overflow-y: auto;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 800px;
+}
+
+.custom-popup .leaflet-popup-content {
+    margin: 0;
+    padding: 10px;
+}
+
+.popup-container {
+    padding: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.popup-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.popup-section {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.popup-section strong {
+    color: #000;
+}
+
+.popup-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+    .custom-popup .leaflet-popup-content-wrapper {
+        max-width: 90%;
     }
+}
+
+@media (min-width: 640px) {
+    .leaflet-right .leaflet-control {
+        margin-right: 2rem;
+    }
+}
 </style>
 @endpush
 
 @section('content')
 
-        <div id="map" role="map" class="h-[88vh] w-screen mx-auto overflow-hidden z-10">
+        <div id="map" role="map" class="h-[88vh] w-screen mx-auto overflow-hidden z-10 px-2">
         </div>
 
         <x-modal></x-modal>

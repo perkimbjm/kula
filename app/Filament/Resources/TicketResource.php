@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\TicketResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\TicketResource\RelationManagers;
+use Filament\Forms\Components\Html;
 
 class TicketResource extends Resource
 {
@@ -185,5 +186,27 @@ class TicketResource extends Resource
         return [
             'index' => Pages\ManageTickets::route('/'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $user = Auth::user();
+        if ($user->role_id === 2) {
+            return static::getModel()::where('user_id', $user->id)->count();
+        }
+        return static::getModel()::count();
+    }
+    
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        // Jika pengguna memiliki role_id 2, mereka hanya boleh melihat tiket mereka sendiri
+        if (Auth::user()->role_id == 2) {
+            $query->where('user_id', Auth::id());
+        }
+
+        return $query;
     }
 }

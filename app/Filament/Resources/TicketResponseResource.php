@@ -153,4 +153,25 @@ class TicketResponseResource extends Resource
             'index' => Pages\ManageTicketResponses::route('/'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $user = Auth::user();
+        if ($user->role_id === 2) {
+            return static::getModel()::where('user_id', $user->id)->count();
+        }
+        return static::getModel()::count();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        // Jika pengguna memiliki role_id 2, mereka hanya boleh melihat tiket mereka sendiri
+        if (Auth::user()->role_id == 2) {
+            $query->where('user_id', Auth::id());
+        }
+
+        return $query;
+    }
 }

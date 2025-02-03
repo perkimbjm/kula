@@ -95,7 +95,7 @@ class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAu
             ExportColumn::make('construct_type')
                 ->label('Jenis Konstruksi'),
             ExportColumn::make('spending_type')
-                ->label('Jenis Pembayaran'),
+                ->label('Jenis Belanja'),
         ];
     }
 

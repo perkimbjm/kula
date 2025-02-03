@@ -89,6 +89,10 @@ return [
         'sidebar' => [
             'is_collapsible_on_desktop' => true,
         ],
+        'notifications' => [
+            'vertical_alignment' => 'center',
+            'alignment' => 'center',
+        ],
     ],
 
 ];

@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\RelationManagers;
 
 class UserResource extends Resource
 {
@@ -37,8 +38,9 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->prefixIcon('heroicon-o-key')
-                    ->required()
-                    ->maxLength(255),
+                    ->required(false)
+                    ->maxLength(255)
+                    ->helperText('Biarkan kosong jika tidak ingin mengubah password'),
                 Forms\Components\Select::make('role_id')
                     ->relationship('role', 'name')
                     ->required()
@@ -64,6 +66,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('role.name')
                     ->label('Role')
                     ->numeric()
+                    ->formatStateUsing(fn($state): string => Str::headline($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label('Email Terverifikasi')

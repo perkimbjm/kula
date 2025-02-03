@@ -31,3 +31,7 @@ Route::get('app/facilities/export', function () {
 
     return Excel::download($export, 'Data PSU.xlsx');
 })->name('facilities.export');
+
+Route::get('/test-web', function () {
+    return response()->json(['message' => 'Web route working']);
+});

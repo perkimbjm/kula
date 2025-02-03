@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <TileColor>#008000</TileColor>
+            
+            <!-- Ikon untuk Windows Tiles -->
+            <square70x70logo src="/img/favicon/Square44x44Logo.altform-lightunplated_targetsize-96.png"/>
+            <square150x150logo src="/img/favicon/Square44x44Logo.altform-lightunplated_targetsize-150.png"/>
+            <square310x310logo src="/img/favicon/Square44x44Logo.altform-lightunplated_targetsize-310.png"/>
+            
+            <!-- Wide Tile (opsional, sesuaikan jika ada) -->
+            <wide310x150logo src="/img/favicon/Wide310x150Logo.scale-100.png"/> 
+        </tile>
+    </msapplication>
+</browserconfig>

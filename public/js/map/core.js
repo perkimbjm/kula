@@ -474,6 +474,130 @@ async function loadRtlhData() {
     }
 }
 
+
+const psu = L.geoJson(null, {
+    pointToLayer: function (feature, latlng) {
+        if (!isValidLatLng(latlng.lat, latlng.lng)) {
+            console.warn("Invalid coordinates detected:", latlng);
+            return null;
+        }
+
+        // Gunakan marker bawaan Leaflet
+        const marker = L.marker(latlng);
+
+        marker.options.clickable = true;
+        marker.options.riseOnHover = true;
+        marker.options.bubblingMouseEvents = false;
+
+        return marker;
+    },
+    onEachFeature: function (feature, layer) {
+        if (feature.properties) {
+            let content = `
+                <div class="popup-container">
+                    <h3 class="popup-title">${feature.properties.name || "-"}</h3>
+                    <div class="popup-section">
+                        <strong>Panjang :</strong> ${feature.properties.length || "-"} meter
+                    </div>
+                    <div class="popup-section">
+                        <strong>Lebar :</strong> ${feature.properties.width || "-"} meter
+                    </div>`;
+    
+            // Cek jika photo_0 tidak null
+            if (feature.properties.photo_0) {
+                content += `
+                    <div class="popup-section">
+                        <strong>Foto Awal :</strong>
+                        <img src="/storage/${feature.properties.photo_0}" alt="Foto Awal" class="popup-image" onerror="handleImageError(this)">
+                    </div>`;
+            }
+    
+            // Cek jika photo_100 tidak null
+            if (feature.properties.photo_100) {
+                content += `
+                    <div class="popup-section">
+                        <strong>Foto 100% :</strong>
+                        <img src="/storage/${feature.properties.photo_100}" alt="Foto 100%" class="popup-image" onerror="handleImageError(this)">
+                    </div>`;
+            }
+    
+            content += `
+                    <div class="popup-section">
+                        <strong>Jenis Konstruksi :</strong> ${feature.properties.construct_type || "-"}
+                    </div>
+                    <div class="popup-section">
+                        <strong>Jenis Belanja :</strong> ${feature.properties.spending_type || "-"}
+                    </div>
+                </div>`;
+    
+            layer.bindPopup(content, {
+                closeButton: true,
+                autoPan: false,
+                maxWidth: 800,
+                className: "custom-popup",
+            });
+        }
+    },
+    filter: function (feature) {
+        const coords = feature.geometry.coordinates;
+        return isValidLatLng(coords[1], coords[0]);
+    },
+});
+
+let isPsuLoaded = false;
+
+async function loadPsuData() {
+    if (!isPsuLoaded) {
+        try {
+            const response = await fetch("/api/psu");
+            const data = await response.json();
+
+            if (!Array.isArray(data)) {
+                throw new Error("Data yang diterima bukan array");
+            }
+
+            const validFeatures = data
+                .filter((item) => isValidLatLng(item.lat, item.lng))
+                .map((item) => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [item.lng, item.lat],
+                    },
+                    properties: {
+                        name: item.name,
+                        length: item.length,
+                        width: item.width,
+                        photo_0: item.photo_0,
+                        photo_100: item.photo_100,
+                        construct_type: item.construct_type,
+                        spending_type: item.spending_type,
+                    },
+                }));
+
+            if (validFeatures.length > 0) {
+                const geoJsonData = {
+                    type: "FeatureCollection",
+                    features: validFeatures,
+                };
+
+                psu.clearLayers();
+                psu.addData(geoJsonData);
+
+                if (!map.hasLayer(psu)) {
+                    map.addLayer(psu);
+                    console.log("Layer PSU ditambahkan");
+                }
+
+                isPsuLoaded = true;
+                console.log("Data PSU berhasil dimuat");
+            }
+        } catch (error) {
+            console.error("Error loading PSU data:", error);
+        }
+    }
+}
+
 // Event listeners
 map.on("zoomstart", function () {
     if (activePopup) {
@@ -492,6 +616,8 @@ map.on("overlayadd", function (e) {
         loadKumuhData();
     } else if (e.name === "Rumah Tidak Layak Huni") {
         loadRtlhData();
+    } else if (e.name === "Pekerjaan PSU") {
+        loadPsuData();
     }
 });
 
@@ -536,7 +662,20 @@ map.on("overlayremove", function (e) {
             map.removeLayer(rtlh);
         }
     }
+
+    if (e.name === "Pekerjaan PSU") {
+        if (map.hasLayer(psu)) {
+            map.removeLayer(psu);
+        }
+    }
 });
+
+function handleImageError(img) {
+    const popupSection = img.closest('.popup-section');
+    if (popupSection) {
+        popupSection.remove();
+    }
+}
 
 function addLayerToControl(layer, name) {
     if (layer && name && layerControl) {
@@ -574,6 +713,7 @@ let groupedOverlays = {
     "<b>TEMATIK</b>": {
         "Permukiman Kumuh": kumuh,
         "Rumah Tidak Layak Huni": rtlhCluster,
+        "Pekerjaan PSU": psu,
     },
     IMPORT: {},
 };
