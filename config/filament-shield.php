@@ -55,7 +55,7 @@ return [
         'pages' => true,
         'widgets' => true,
         'resources' => true,
-        'custom_permissions' => true,
+        'custom_permissions' => false,
     ],
 
     'generator' => [
@@ -79,9 +79,9 @@ return [
     ],
 
     'discovery' => [
-        'discover_all_resources' => true,
-        'discover_all_widgets' => true,
-        'discover_all_pages' => true,
+        'discover_all_resources' => false,
+        'discover_all_widgets' => false,
+        'discover_all_pages' => false,
     ],
 
     'register_role_policy' => [

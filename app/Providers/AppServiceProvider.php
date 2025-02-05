@@ -9,6 +9,7 @@ use App\Observers\UserObserver;
 use Illuminate\Support\Facades\URL;
 use App\Filament\Widgets\StatsOverview;
 use Illuminate\Support\ServiceProvider;
+use App\Filament\Pages\Auth\LoginScreenPage;
 // use EightyNine\FilamentAdvancedWidget\AdvancedStatsOverviewWidget;
 
 
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
 
         Livewire::component('filament.widgets.stats-overview', StatsOverview::class);
+        Livewire::component('app.filament.pages.auth.login-screen-page', LoginScreenPage::class);
 
     }
 }
