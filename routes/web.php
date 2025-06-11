@@ -29,7 +29,7 @@ Route::get('app/facilities/export', function () {
     $filters = request()->get('tableFilters', []);
     $export = new FacilityExporter($filters);
 
-    return Excel::download($export, 'Data PSU.xlsx');
+    return Excel::download($export, 'Data Laporan.xlsx');
 })->name('facilities.export');
 
 Route::get('/test-web', function () {

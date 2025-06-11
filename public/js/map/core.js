@@ -474,7 +474,6 @@ async function loadRtlhData() {
     }
 }
 
-
 const psu = L.geoJson(null, {
     pointToLayer: function (feature, latlng) {
         if (!isValidLatLng(latlng.lat, latlng.lng)) {
@@ -495,14 +494,20 @@ const psu = L.geoJson(null, {
         if (feature.properties) {
             let content = `
                 <div class="popup-container">
-                    <h3 class="popup-title">${feature.properties.name || "-"}</h3>
+                    <h3 class="popup-title">${
+                        feature.properties.name || "-"
+                    }</h3>
                     <div class="popup-section">
-                        <strong>Panjang :</strong> ${feature.properties.length || "-"} meter
+                        <strong>Panjang :</strong> ${
+                            feature.properties.length || "-"
+                        } meter
                     </div>
                     <div class="popup-section">
-                        <strong>Lebar :</strong> ${feature.properties.width || "-"} meter
+                        <strong>Lebar :</strong> ${
+                            feature.properties.width || "-"
+                        } meter
                     </div>`;
-    
+
             // Cek jika photo_0 tidak null
             if (feature.properties.photo_0) {
                 content += `
@@ -511,7 +516,7 @@ const psu = L.geoJson(null, {
                         <img src="/storage/${feature.properties.photo_0}" alt="Foto Awal" class="popup-image" onerror="handleImageError(this)">
                     </div>`;
             }
-    
+
             // Cek jika photo_100 tidak null
             if (feature.properties.photo_100) {
                 content += `
@@ -520,16 +525,20 @@ const psu = L.geoJson(null, {
                         <img src="/storage/${feature.properties.photo_100}" alt="Foto 100%" class="popup-image" onerror="handleImageError(this)">
                     </div>`;
             }
-    
+
             content += `
                     <div class="popup-section">
-                        <strong>Jenis Konstruksi :</strong> ${feature.properties.construct_type || "-"}
+                        <strong>Jenis Konstruksi :</strong> ${
+                            feature.properties.construct_type || "-"
+                        }
                     </div>
                     <div class="popup-section">
-                        <strong>Jenis Belanja :</strong> ${feature.properties.spending_type || "-"}
+                        <strong>Jenis Belanja :</strong> ${
+                            feature.properties.spending_type || "-"
+                        }
                     </div>
                 </div>`;
-    
+
             layer.bindPopup(content, {
                 closeButton: true,
                 autoPan: false,
@@ -586,14 +595,14 @@ async function loadPsuData() {
 
                 if (!map.hasLayer(psu)) {
                     map.addLayer(psu);
-                    console.log("Layer PSU ditambahkan");
+                    console.log("Layer Laporan ditambahkan");
                 }
 
                 isPsuLoaded = true;
-                console.log("Data PSU berhasil dimuat");
+                console.log("Data Laporan berhasil dimuat");
             }
         } catch (error) {
-            console.error("Error loading PSU data:", error);
+            console.error("Error loading Laporan data:", error);
         }
     }
 }
@@ -671,7 +680,7 @@ map.on("overlayremove", function (e) {
 });
 
 function handleImageError(img) {
-    const popupSection = img.closest('.popup-section');
+    const popupSection = img.closest(".popup-section");
     if (popupSection) {
         popupSection.remove();
     }
@@ -695,10 +704,14 @@ function addLayerToControl(layer, name) {
 
             layerControl.addTo(map);
         } else {
-            console.error(`Layer "${name}" tidak memiliki _leaflet_id yang valid.`);
+            console.error(
+                `Layer "${name}" tidak memiliki _leaflet_id yang valid.`
+            );
         }
     } else {
-        console.error(`Gagal menambahkan layer "${name}" ke layer control: Parameter tidak valid.`);
+        console.error(
+            `Gagal menambahkan layer "${name}" ke layer control: Parameter tidak valid.`
+        );
     }
 }
 
@@ -777,7 +790,6 @@ function popUp(geo) {
 }
 
 let geo;
-
 
 function geoJsonData(file) {
     let reader = new FileReader();

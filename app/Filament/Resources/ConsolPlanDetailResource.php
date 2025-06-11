@@ -39,7 +39,7 @@ class ConsolPlanDetailResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric(),
                 Forms\Components\Select::make('consol_plan_id')
                     ->label('ID Konsolidasi Perencanaan')
@@ -63,7 +63,7 @@ class ConsolPlanDetailResource extends Resource
                     ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('consolPlan.id')

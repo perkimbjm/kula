@@ -24,7 +24,7 @@ class ListWorks extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        
+
         return [
             Actions\CreateAction::make(),
             Actions\Action::make('export')
@@ -50,7 +50,7 @@ class ListWorks extends ListRecords
                     try {
                         $filters = $this->getTableFilters();
                         $selectedColumns = $data['selectedColumns'];
-                        
+
                         return Excel::download(
                             new FilteredWorkExport($filters, $selectedColumns),
                             'laporan_kemajuan_pekerjaan_' . now()->format('Y-m-d_His') . '.xlsx'
@@ -87,7 +87,7 @@ class ListWorks extends ListRecords
                     try {
                         if (isset($data['file'])) {
                             $filePath = storage_path('app/' . $data['file']);
-                            
+
                             // Debug information
                             \Log::info('File path:', [
                                 'storage_path' => $filePath,
@@ -96,31 +96,31 @@ class ListWorks extends ListRecords
                                 'file_size' => filesize($filePath), // Log file size
                                 'mime_type' => mime_content_type($filePath), // Log mime type
                             ]);
-                
+
                             if (!file_exists($filePath)) {
                                 throw new \Exception('File tidak ditemukan di: ' . $filePath);
                             }
-                
+
                             if (!is_readable($filePath)) {
                                 throw new \Exception('File tidak dapat dibaca di: ' . $filePath);
                             }
-                
+
                             // Assuming $filePath is a valid file upload path
                             $uploadedFile = new UploadedFile($filePath, basename($filePath));
-                
+
                             // Log before importing the file
                             \Log::info('Starting import process for file:', ['file_path' => $filePath]);
-                
+
                             // Create an Import object with the file
                             $import = new Import();
-                
+
                             // Pass the Import object to the WorkImporter
                             $importResult =  Excel::import(new WorkImporter($import, WorkImporter::getColumns(), []), $filePath);
-                
+
                             // Log import result (if applicable)
                             \Log::info('Import result:', ['import_result' => $importResult]);
-                            
-                
+
+
                             // Notification for success
                             Notification::make()
                                 ->success()
@@ -133,7 +133,7 @@ class ListWorks extends ListRecords
                         // Log the error message and stack trace
                         \Log::error('Import error: ' . $e->getMessage());
                         \Log::error('Stack trace: ' . $e->getTraceAsString());
-                
+
                         Notification::make()
                             ->danger()
                             ->title('Gagal import data')
@@ -142,7 +142,7 @@ class ListWorks extends ListRecords
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading('Import Data Kemajuan Pekerjaan Fisik')
+                ->modalHeading('Import Data Proyek')
                 ->modalDescription('Pastikan format file sesuai dengan template yang telah ditentukan. Harap Gunakan template import terlebih dahulu supaya berhasil')
                 ->modalSubmitActionLabel('Upload dan Import'),
 

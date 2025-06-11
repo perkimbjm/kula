@@ -21,7 +21,7 @@ class PlanResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen PBJ';
 
-    protected static ?string $label = 'Paket Perencanaan';
+    protected static ?string $label = 'Perencanaan Biasa';
 
     public static function form(Form $form): Form
     {
@@ -40,13 +40,13 @@ class PlanResource extends Resource
                     ->label('HPS')
                     ->numeric(),
                 Forms\Components\TextInput::make('bid_value')
-                    ->label('Harga Pengadaan')
+                    ->label('Harga SPK')
                     ->numeric(),
                 Forms\Components\TextInput::make('correction_value')
-                    ->label('Koreksi Aritmatik')
+                    ->label('Aritmatik')
                     ->numeric(),
                 Forms\Components\TextInput::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric(),
                 Forms\Components\Select::make('consultant_id')
                     ->label('Konsultan')
@@ -72,11 +72,11 @@ class PlanResource extends Resource
                     ->label('Tanggal SPK')
                     ->required(),
                 Forms\Components\TextInput::make('account_type')
-                    ->label('Kode Rekening')
+                    ->label('Sumber Dana')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('program')
-                    ->label('Kegiatan')
+                    ->label('Paket')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('duration')
@@ -101,15 +101,15 @@ class PlanResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('bid_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('correction_value')
-                    ->label('Koreksi Aritmatik')
+                    ->label('Aritmatik')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('consultant.name')
@@ -144,7 +144,7 @@ class PlanResource extends Resource
                     ->label('Jenis Akun')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('program')
-                    ->label('Kegiatan')
+                    ->label('Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('duration')
                     ->label('Lama Pelaksanaan (hari kalender)')

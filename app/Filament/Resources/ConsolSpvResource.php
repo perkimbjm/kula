@@ -39,10 +39,10 @@ class ConsolSpvResource extends Resource
                     ->label('Nilai Penawaran')
                     ->numeric(),
                 Forms\Components\TextInput::make('correction_value')
-                    ->label('Koreksi Aritmatik')
+                    ->label('Aritmatik')
                     ->numeric(),
                 Forms\Components\TextInput::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric(),
                 Forms\Components\Select::make('consultant_id')
                     ->label('Konsultan')
@@ -68,11 +68,11 @@ class ConsolSpvResource extends Resource
                     ->label('Tanggal SPK')
                     ->required(),
                 Forms\Components\TextInput::make('account_type')
-                    ->label('Kode Rekening')
+                    ->label('Sumber Dana')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('program')
-                    ->label('Kegiatan')
+                    ->label('Paket')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('duration')

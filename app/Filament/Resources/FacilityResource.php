@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Section;
-use App\Tables\Columns\ProgressColumn; 
+use App\Tables\Columns\ProgressColumn;
 use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\FacilityExporter;
@@ -33,14 +33,14 @@ class FacilityResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
-    protected static ?string $label = 'PSU';
+    protected static ?string $label = 'Laporan';
 
     public static function form(Form $form): Form
     {
         return $form
         ->schema([
             Forms\Components\TextInput::make('name')
-                ->label('Nama')
+                ->label('Nama Paket')
                 ->required()
                 ->maxLength(255)
                 ->columnSpanFull(),
@@ -69,8 +69,8 @@ class FacilityResource extends Resource
                         ->relationship('village', 'name')
                         ->options(function ($get) {
                             $districtId = $get('district_id');
-                            return $districtId 
-                                ? \App\Models\District::find($districtId)->villages->pluck('name', 'id') 
+                            return $districtId
+                                ? \App\Models\District::find($districtId)->villages->pluck('name', 'id')
                                 : [];
                         })
                         ->required(),
@@ -190,13 +190,13 @@ class FacilityResource extends Resource
                         ->label('Catatan PHO')
                         ->columnSpanFull(),
                     Forms\Components\Select::make('team')
-                        ->label('Tim PHO')
+                        ->label('Tim Teknis')
                         ->multiple()
                         ->relationship('officers', 'name')
                         ->preload()
                         ->columnSpanFull()
                         ->searchable()
-                        ->placeholder('Pilih Tim PHO'),
+                        ->placeholder('Pilih Tim Teknis'),
                     Forms\Components\Hidden::make('team'),
                     Forms\Components\TextInput::make('construct_type')
                         ->label('Jenis Konstruksi')
@@ -250,17 +250,17 @@ class FacilityResource extends Resource
                     ->action(function (array $data, $livewire) {
                         $filters = $livewire->tableFilters;
                         $selectedColumns = $data['selectedColumns'];
-                
+
                         $export = new FacilityExporter($filters, $selectedColumns);
-                
-                        return Excel::download($export, 'Data PSU.xlsx');
+
+                        return Excel::download($export, 'Data Laporan.xlsx');
                     })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ViewAction::make(),
-                
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('contractor')
@@ -279,7 +279,7 @@ class FacilityResource extends Resource
     public static function getListTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('name')->label('Nama')->searchable(),
+            Tables\Columns\TextColumn::make('name')->label('Nama Paket')->searchable(),
             Tables\Columns\TextColumn::make('contractor.name')->label('Kontraktor')->sortable(),
             Tables\Columns\TextColumn::make('consultant.name')->label('Konsultan')->sortable(),
             Tables\Columns\TextColumn::make('district.name')->label('Kecamatan')->sortable(),
@@ -298,13 +298,13 @@ class FacilityResource extends Resource
                     $real6 = floatval($record->real_6);
                     $real7 = floatval($record->real_7);
                     $real8 = floatval($record->real_8);
-                    
+
                     $values = [$real1, $real2, $real3, $real4, $real5, $real6, $real7, $real8];
                     $maxValue = max($values);
-                    
+
                     return number_format($maxValue, 2);
                 }),
-            Tables\Columns\TextColumn::make('team')->label('Tim PHO')->searchable(),
+            Tables\Columns\TextColumn::make('team')->label('Tim Teknis')->searchable(),
             Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
             Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
             Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
@@ -316,7 +316,7 @@ class FacilityResource extends Resource
     public static function getGridTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('name')->label('Nama')->searchable(),
+            Tables\Columns\TextColumn::make('name')->label('Nama Paket')->searchable(),
             Tables\Columns\TextColumn::make('contractor.name')->label('Kontraktor')->sortable(),
             Tables\Columns\TextColumn::make('consultant.name')->label('Konsultan')->sortable(),
             Tables\Columns\TextColumn::make('district.name')->label('Kecamatan')->sortable(),
@@ -335,13 +335,13 @@ class FacilityResource extends Resource
                     $real6 = floatval($record->real_6);
                     $real7 = floatval($record->real_7);
                     $real8 = floatval($record->real_8);
-                    
+
                     $values = [$real1, $real2, $real3, $real4, $real5, $real6, $real7, $real8];
                     $maxValue = max($values);
-                    
+
                     return number_format($maxValue, 2);
                 }),
-            Tables\Columns\TextColumn::make('team')->label('Tim PHO')->searchable(),
+            Tables\Columns\TextColumn::make('team')->label('Tim Teknis')->searchable(),
             Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
             Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
             Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),

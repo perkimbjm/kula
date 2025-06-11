@@ -13,7 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Filament\Imports\WorkImporter;
-use App\Tables\Columns\ProgressColumn; 
+use App\Tables\Columns\ProgressColumn;
 use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\FilteredWorkExport;
@@ -30,7 +30,7 @@ class WorkResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
-    protected static ?string $label = 'Kemajuan Pekerjaan Fisik';
+    protected static ?string $label = 'Proyek';
 
     public static function form(Form $form): Form
     {
@@ -58,7 +58,7 @@ class WorkResource extends Resource
                     Forms\Components\DatePicker::make('cutoff')
                         ->label('Tanggal Cutoff/Selesai'),
                 ]),
-                
+
                 Forms\Components\Fieldset::make('Penyedia')->schema([
                     Forms\Components\Select::make('contractor_id')
                         ->label('Kontraktor')
@@ -73,7 +73,7 @@ class WorkResource extends Resource
                         ->label('Konsultan Pengawas')
                         ->searchable()
                         ->relationship('supervisor', 'name'),
-                ]),                
+                ]),
                 Forms\Components\Fieldset::make('Realisasi Fisik dan Keuangan')->schema([
                 Forms\Components\TextInput::make('progress')
                     ->label('Progres Pekerjaan Fisik')
@@ -83,7 +83,7 @@ class WorkResource extends Resource
                     ->maxValue(100)
                     ->step(0.01)
                     ->default(0),
-                Forms\Components\Select::make('status') 
+                Forms\Components\Select::make('status')
                     ->label('Status Pelaksanaan')
                     ->enum(WorkStatus::class)
                     ->options(WorkStatus::class)

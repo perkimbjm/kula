@@ -24,7 +24,7 @@ class SurveyResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
-    protected static ?string $label = 'Survei';
+    protected static ?string $label = 'Tracking';
 
     public static function form(Form $form): Form
     {
@@ -55,7 +55,7 @@ class SurveyResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('program')
-                    ->label('Jenis Kegiatan')
+                    ->label('Jenis Paket')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
@@ -146,7 +146,7 @@ class SurveyResource extends Resource
                     ->label('Jenis Usulan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('program')
-                    ->label('Jenis Kegiatan')
+                    ->label('Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('lat')
                     ->searchable(),

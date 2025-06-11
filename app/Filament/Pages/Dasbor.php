@@ -12,7 +12,7 @@ use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 class Dasbor extends Page
 {
     use HasPageShield;
-    
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static string $view = 'filament.pages.dasbor';
@@ -22,10 +22,9 @@ class Dasbor extends Page
         return [
             AccountWidget::class,
             StatsOverview::class,
-            WorkScoreboardWidget::class,
             // AdvancedStatsOverviewWidget::class
         ];
     }
 
-    
+
 }

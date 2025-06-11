@@ -39,7 +39,7 @@ class ConsolSpvDetailResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric(),
                 Forms\Components\Select::make('consol_spv_id')
                     ->label('ID Konsolidasi Pengawasan')
@@ -63,7 +63,7 @@ class ConsolSpvDetailResource extends Resource
                     ->label('Nama Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nego_value')
-                    ->label('Harga Nego')
+                    ->label('Penawaran')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('consolSpv.id')
