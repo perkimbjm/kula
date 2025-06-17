@@ -29,7 +29,7 @@ class ConsultantFactory extends Factory
             'npwp' => $this->faker->word(),
             'leader' => $this->faker->word(),
             'position' => $this->faker->word(),
-            'slug' => $this->faker->slug(),
+            'bank' => $this->faker->company(),
             'account_number' => $this->faker->word(),
             'account_holder' => $this->faker->word(),
             'header_scan' => $this->faker->word(),

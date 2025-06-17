@@ -16,6 +16,7 @@ class Spv extends Model
      * @var array
      */
     protected $fillable = [
+        'contract_number',
         'procurement_officer_id',
         'oe',
         'bid_value',
@@ -31,6 +32,11 @@ class Spv extends Model
         'account_type',
         'program',
         'duration',
+        'year',
+        'addendum_number',
+        'payment_date',
+        'payment_value',
+        'ba_lkpp',
     ];
 
     /**
@@ -52,6 +58,9 @@ class Spv extends Model
         'BAHPL_date' => 'date',
         'sppbj_date' => 'date',
         'spk_date' => 'date',
+        'year' => 'integer',
+        'payment_date' => 'date',
+        'payment_value' => 'float',
     ];
 
     public function procurementOfficer(): BelongsTo

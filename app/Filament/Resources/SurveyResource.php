@@ -24,7 +24,7 @@ class SurveyResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
-    protected static ?string $label = 'Tracking';
+    protected static ?string $label = 'Survei';
 
     public static function form(Form $form): Form
     {

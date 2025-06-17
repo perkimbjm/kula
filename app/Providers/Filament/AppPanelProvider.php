@@ -48,14 +48,15 @@ class AppPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-
-
             ])
             ->sidebarFullyCollapsibleOnDesktop()
             ->collapsedSidebarWidth('0')
             ->brandLogo(asset('/img/panel-logo.png'))
             ->darkModeBrandLogo(asset('/img/panel-logo-dark.png'))
             ->favicon(asset('/img/favicon/favicon.ico'))
+            ->databaseNotifications(false)
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->spa()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -73,7 +74,7 @@ class AppPanelProvider extends PanelProvider
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 \Hydrat\TableLayoutToggle\TableLayoutTogglePlugin::make([
-                    'defaultLayout' => 'grid',
+                    'defaultLayout' => 'list',
                     'persistLayoutInLocalStorage' => true,
                     'shareLayoutBetweenPages' => false,
                     'displayToggleAction' => true,

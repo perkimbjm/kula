@@ -16,8 +16,10 @@ class Plan extends Model
      * @var array
      */
     protected $fillable = [
-        'year',
+        'contract_number',
+        'program',
         'procurement_officer_id',
+        'duration',
         'oe',
         'bid_value',
         'correction_value',
@@ -30,8 +32,11 @@ class Plan extends Model
         'sppbj_date',
         'spk_date',
         'account_type',
-        'program',
-        'duration',
+        'year',
+        'addendum_number',
+        'payment_date',
+        'payment_value',
+        'ba_lkpp',
     ];
 
     /**
@@ -46,6 +51,7 @@ class Plan extends Model
         'bid_value' => 'float',
         'correction_value' => 'float',
         'nego_value' => 'float',
+        'payment_value' => 'float',
         'consultant_id' => 'integer',
         'invite_date' => 'date',
         'evaluation_date' => 'date',
@@ -53,6 +59,7 @@ class Plan extends Model
         'BAHPL_date' => 'date',
         'sppbj_date' => 'date',
         'spk_date' => 'date',
+        'payment_date' => 'date',
     ];
 
     public function procurementOfficer(): BelongsTo

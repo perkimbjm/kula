@@ -7,16 +7,17 @@ use Filament\Actions;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Filament\Imports\WorkImporter;
+use App\Filament\Exports\WorkExporter;
 use App\Filament\Resources\WorkResource;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Forms\Components\CheckboxList;
-use App\Filament\Exports\FilteredWorkExport;
+use Illuminate\Support\Facades\Log;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Illuminate\Http\UploadedFile;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListWorks extends ListRecords
 {
@@ -24,9 +25,26 @@ class ListWorks extends ListRecords
 
     protected function getHeaderActions(): array
     {
-
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('clearCache')
+                ->label('Clear Cache')
+                ->icon('heroicon-o-arrow-path')
+                ->color('warning')
+                ->action(function () {
+                    // Clear cache untuk performa yang lebih baik
+                    Cache::forget('work_years');
+                    Cache::forget('work_account_codes');
+                    Cache::forget('work_programs');
+                    Cache::flush(); // Clear all work scoreboard cache
+
+                    Notification::make()
+                        ->success()
+                        ->title('Cache berhasil dibersihkan!')
+                        ->body('Data akan dimuat ulang pada akses berikutnya.')
+                        ->send();
+                })
+                ->requiresConfirmation(),
             Actions\Action::make('export')
                 ->label('Ekspor ke Excel')
                 ->icon('heroicon-o-table-cells')
@@ -34,16 +52,8 @@ class ListWorks extends ListRecords
                 ->form([
                     CheckboxList::make('selectedColumns')
                         ->label('Pilih Kolom yang ingin diekspor')
-                        ->options(function () {
-                            return collect(FilteredWorkExport::getColumns())->mapWithKeys(function ($column) {
-                                return [$column->getName() => $column->getLabel()];
-                            })->toArray();
-                        })
-                        ->default(function () {
-                            return collect(FilteredWorkExport::getColumns())
-                                ->map(fn ($column) => $column->getName())
-                                ->toArray();
-                        })
+                        ->options(WorkExporter::getColumns())
+                        ->default(array_keys(WorkExporter::getColumns()))
                         ->required(),
                 ])
                 ->action(function (array $data) {
@@ -52,7 +62,7 @@ class ListWorks extends ListRecords
                         $selectedColumns = $data['selectedColumns'];
 
                         return Excel::download(
-                            new FilteredWorkExport($filters, $selectedColumns),
+                            new WorkExporter($filters, $selectedColumns),
                             'laporan_kemajuan_pekerjaan_' . now()->format('Y-m-d_His') . '.xlsx'
                         );
                     } catch (\Exception $e) {
@@ -78,9 +88,9 @@ class ListWorks extends ListRecords
                         ])
                         ->maxSize(5120)
                         ->required()
-                        ->disk('local') // Tambahkan ini
-                        ->directory('temp-imports') // Tambahkan ini
-                        ->visibility('private') // Tambahkan ini
+                        ->disk('local')
+                        ->directory('temp-imports')
+                        ->visibility('private')
                         ->helperText('Format file harus .xlsx dengan ukuran maksimal 5MB')
                 ])
                 ->action(function (array $data) {
@@ -89,12 +99,12 @@ class ListWorks extends ListRecords
                             $filePath = storage_path('app/' . $data['file']);
 
                             // Debug information
-                            \Log::info('File path:', [
+                            Log::info('Work file path:', [
                                 'storage_path' => $filePath,
                                 'exists' => file_exists($filePath),
                                 'readable' => is_readable($filePath),
-                                'file_size' => filesize($filePath), // Log file size
-                                'mime_type' => mime_content_type($filePath), // Log mime type
+                                'file_size' => file_exists($filePath) ? filesize($filePath) : 0,
+                                'mime_type' => file_exists($filePath) ? mime_content_type($filePath) : 'unknown',
                             ]);
 
                             if (!file_exists($filePath)) {
@@ -105,34 +115,24 @@ class ListWorks extends ListRecords
                                 throw new \Exception('File tidak dapat dibaca di: ' . $filePath);
                             }
 
-                            // Assuming $filePath is a valid file upload path
-                            $uploadedFile = new UploadedFile($filePath, basename($filePath));
-
                             // Log before importing the file
-                            \Log::info('Starting import process for file:', ['file_path' => $filePath]);
+                            Log::info('Starting work import process for file:', ['file_path' => $filePath]);
 
-                            // Create an Import object with the file
-                            $import = new Import();
-
-                            // Pass the Import object to the WorkImporter
-                            $importResult =  Excel::import(new WorkImporter($import, WorkImporter::getColumns(), []), $filePath);
-
-                            // Log import result (if applicable)
-                            \Log::info('Import result:', ['import_result' => $importResult]);
-
+                            // Import the file
+                            Excel::import(new WorkImporter(), $filePath);
 
                             // Notification for success
                             Notification::make()
                                 ->success()
-                                ->title('Data berhasil diimport!')
+                                ->title('Data kemajuan pekerjaan berhasil diimport!')
                                 ->send();
                         } else {
                             throw new \Exception('File tidak ditemukan dalam request');
                         }
                     } catch (\Exception $e) {
                         // Log the error message and stack trace
-                        \Log::error('Import error: ' . $e->getMessage());
-                        \Log::error('Stack trace: ' . $e->getTraceAsString());
+                        Log::error('Work import error: ' . $e->getMessage());
+                        Log::error('Stack trace: ' . $e->getTraceAsString());
 
                         Notification::make()
                             ->danger()
@@ -142,17 +142,35 @@ class ListWorks extends ListRecords
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading('Import Data Proyek')
-                ->modalDescription('Pastikan format file sesuai dengan template yang telah ditentukan. Harap Gunakan template import terlebih dahulu supaya berhasil')
+                ->modalHeading('Import Data Kemajuan Pekerjaan Fisik')
+                ->modalDescription('Pastikan format file sesuai dengan template yang telah ditentukan. Harap gunakan template import terlebih dahulu supaya berhasil.')
                 ->modalSubmitActionLabel('Upload dan Import'),
 
-                Actions\Action::make('downloadTemplate')
-                    ->label('Download Template')
-                    ->icon('heroicon-o-cloud-arrow-down')
-                    ->color('danger')
-                    ->url('/data/template_data_progres.xlsx')
-                    ->openUrlInNewTab(true),
-
+            Actions\Action::make('downloadTemplate')
+                ->label('Download Template')
+                ->icon('heroicon-o-cloud-arrow-down')
+                ->color('danger')
+                ->url('/data/template_work_new.xlsx')
+                ->openUrlInNewTab(true),
         ];
+    }
+
+    /**
+     * Optimize table query untuk performa yang lebih baik
+     */
+    protected function modifyQuery(Builder $query): Builder
+    {
+        return $query->withFullRelations()
+            ->when(
+                request()->has('tableSearch'),
+                fn ($q) => $q->where(function ($searchQuery) {
+                    $search = request('tableSearch');
+                    $searchQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('contract_number', 'like', "%{$search}%")
+                        ->orWhereHas('district', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('village', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('contractor', fn ($q) => $q->where('name', 'like', "%{$search}%"));
+                })
+            );
     }
 }

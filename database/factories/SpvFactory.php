@@ -23,6 +23,7 @@ class SpvFactory extends Factory
     public function definition(): array
     {
         return [
+            'contract_number' => $this->faker->bothify('SPK-###/??/###'),
             'procurement_officer_id' => ProcurementOfficer::factory(),
             'oe' => $this->faker->randomFloat(0, 0, 9999999999.),
             'bid_value' => $this->faker->randomFloat(0, 0, 9999999999.),
@@ -38,6 +39,11 @@ class SpvFactory extends Factory
             'account_type' => $this->faker->word(),
             'program' => $this->faker->word(),
             'duration' => $this->faker->numberBetween(-10000, 10000),
+            'year' => $this->faker->numberBetween(2020, 2025),
+            'addendum_number' => $this->faker->optional()->bothify('ADD-####/????'),
+            'payment_date' => $this->faker->optional()->date(),
+            'payment_value' => $this->faker->optional()->randomFloat(0, 0, 9999999999.),
+            'ba_lkpp' => $this->faker->optional()->bothify('BA-LKPP-####/????'),
         ];
     }
 }

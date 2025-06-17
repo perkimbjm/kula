@@ -22,14 +22,14 @@ class SurveyPhotoResource extends Resource
 
     protected static ?string $navigationGroup = 'Manajemen Proyek';
 
-    protected static ?string $label = 'Foto-foto Tracking';
+    protected static ?string $label = 'Foto-foto Survei';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('survey_id')
-                    ->label('Tracking')
+                    ->label('Survei')
                     ->relationship('survey', 'name')
                     ->required(),
                 Forms\Components\Textarea::make('description')
@@ -51,10 +51,10 @@ class SurveyPhotoResource extends Resource
             ->query(SurveyPhoto::query())
             ->columns([
                 Tables\Columns\TextColumn::make('survey.name')
-                    ->label('Nama Tracking')
+                    ->label('Nama Survei')
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('photo_url')
-                    ->label('Foto Tracking')
+                    ->label('Foto Survei')
                     ->size(350, 180),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Penjelasan Foto')
@@ -82,7 +82,7 @@ class SurveyPhotoResource extends Resource
             ])
             ->groups([
                 Tables\Grouping\Group::make('survey.name')
-                    ->label('Nama Tracking')
+                    ->label('Nama Survei')
                     ->collapsible(),
             ]);
     }

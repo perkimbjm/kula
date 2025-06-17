@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Facility;
+use App\Models\Work;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -33,5 +34,10 @@ class Officer extends Model
     public function facilities()
     {
         return $this->belongsToMany(Facility::class);
+    }
+
+    public function works()
+    {
+        return $this->belongsToMany(Work::class, 'officer_work');
     }
 }

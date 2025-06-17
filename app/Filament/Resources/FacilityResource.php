@@ -210,24 +210,39 @@ class FacilityResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $livewire = $table->getLivewire();
-
         return $table
-            ->columns(
-                $livewire->isGridLayout()
-                    ? static::getGridTableColumns()
-                    : static::getListTableColumns()
-            )
-            ->defaultView('list')
-            ->contentGrid(
-                fn () => $livewire->isListLayout()
-                    ? null
-                    : [
-                        'md' => 2,
-                        'lg' => 3,
-                        'xl' => 4,
-                    ]
-            )
+            ->columns([
+                Tables\Columns\TextColumn::make('name')->label('Nama Paket')->searchable(),
+                Tables\Columns\TextColumn::make('contractor.name')->label('Kontraktor')->sortable(),
+                Tables\Columns\TextColumn::make('consultant.name')->label('Konsultan')->sortable(),
+                Tables\Columns\TextColumn::make('district.name')->label('Kecamatan')->sortable(),
+                Tables\Columns\TextColumn::make('village.name')->label('Kelurahan / Desa')->sortable(),
+                Tables\Columns\TextColumn::make('length')->label('Panjang')->sortable(),
+                Tables\Columns\TextColumn::make('width')->label('Lebar')->sortable(),
+                ProgressColumn::make('highest_progress')
+                    ->label('Realisasi Fisik Terakhir')
+                    ->state(function ($record) {
+
+                        $real1 = floatval($record->real_1);
+                        $real2 = floatval($record->real_2);
+                        $real3 = floatval($record->real_3);
+                        $real4 = floatval($record->real_4);
+                        $real5 = floatval($record->real_5);
+                        $real6 = floatval($record->real_6);
+                        $real7 = floatval($record->real_7);
+                        $real8 = floatval($record->real_8);
+
+                        $values = [$real1, $real2, $real3, $real4, $real5, $real6, $real7, $real8];
+                        $maxValue = max($values);
+
+                        return number_format($maxValue, 2);
+                    }),
+                Tables\Columns\TextColumn::make('team')->label('Tim Teknis')->searchable(),
+                Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
+                Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+            ])
             ->headerActions([
                 Action::make('export')
                     ->label('Ekspor ke Excel')
@@ -274,80 +289,6 @@ class FacilityResource extends Resource
                     ->label('Kelurahan / Desa')
                     ->searchable(),
             ]);
-    }
-
-    public static function getListTableColumns(): array
-    {
-        return [
-            Tables\Columns\TextColumn::make('name')->label('Nama Paket')->searchable(),
-            Tables\Columns\TextColumn::make('contractor.name')->label('Kontraktor')->sortable(),
-            Tables\Columns\TextColumn::make('consultant.name')->label('Konsultan')->sortable(),
-            Tables\Columns\TextColumn::make('district.name')->label('Kecamatan')->sortable(),
-            Tables\Columns\TextColumn::make('village.name')->label('Kelurahan / Desa')->sortable(),
-            Tables\Columns\TextColumn::make('length')->label('Panjang')->sortable(),
-            Tables\Columns\TextColumn::make('width')->label('Lebar')->sortable(),
-            ProgressColumn::make('highest_progress')
-                ->label('Realisasi Fisik Terakhir')
-                ->state(function ($record) {
-
-                    $real1 = floatval($record->real_1);
-                    $real2 = floatval($record->real_2);
-                    $real3 = floatval($record->real_3);
-                    $real4 = floatval($record->real_4);
-                    $real5 = floatval($record->real_5);
-                    $real6 = floatval($record->real_6);
-                    $real7 = floatval($record->real_7);
-                    $real8 = floatval($record->real_8);
-
-                    $values = [$real1, $real2, $real3, $real4, $real5, $real6, $real7, $real8];
-                    $maxValue = max($values);
-
-                    return number_format($maxValue, 2);
-                }),
-            Tables\Columns\TextColumn::make('team')->label('Tim Teknis')->searchable(),
-            Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
-            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
-            Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-            Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-
-        ];
-    }
-
-    public static function getGridTableColumns(): array
-    {
-        return [
-            Tables\Columns\TextColumn::make('name')->label('Nama Paket')->searchable(),
-            Tables\Columns\TextColumn::make('contractor.name')->label('Kontraktor')->sortable(),
-            Tables\Columns\TextColumn::make('consultant.name')->label('Konsultan')->sortable(),
-            Tables\Columns\TextColumn::make('district.name')->label('Kecamatan')->sortable(),
-            Tables\Columns\TextColumn::make('village.name')->label('Kelurahan / Desa')->sortable(),
-            Tables\Columns\TextColumn::make('length')->label('Panjang')->sortable(),
-            Tables\Columns\TextColumn::make('width')->label('Lebar')->sortable(),
-            ProgressColumn::make('highest_progress')
-                ->label('Realisasi Fisik Terakhir')
-                ->state(function ($record) {
-
-                    $real1 = floatval($record->real_1);
-                    $real2 = floatval($record->real_2);
-                    $real3 = floatval($record->real_3);
-                    $real4 = floatval($record->real_4);
-                    $real5 = floatval($record->real_5);
-                    $real6 = floatval($record->real_6);
-                    $real7 = floatval($record->real_7);
-                    $real8 = floatval($record->real_8);
-
-                    $values = [$real1, $real2, $real3, $real4, $real5, $real6, $real7, $real8];
-                    $maxValue = max($values);
-
-                    return number_format($maxValue, 2);
-                }),
-            Tables\Columns\TextColumn::make('team')->label('Tim Teknis')->searchable(),
-            Tables\Columns\TextColumn::make('construct_type')->label('Jenis Konstruksi')->searchable(),
-            Tables\Columns\TextColumn::make('spending_type')->label('Jenis Belanja')->searchable(),
-            Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-            Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
-
-        ];
     }
 
     public static function getRelations(): array

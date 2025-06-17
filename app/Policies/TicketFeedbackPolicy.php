@@ -23,10 +23,7 @@ class TicketFeedbackPolicy
      */
     public function view(User $user, TicketFeedback $ticketFeedback): bool
     {
-        if ($user->role_id === 3) {
-            return $ticketFeedback->admin_id === $user->id;
-        }
-        return $user->role_id === 1 || $user->id === $ticketFeedback->user_id;
+        return $user->can('view_ticket::feedback');
     }
 
     /**
@@ -42,13 +39,7 @@ class TicketFeedbackPolicy
      */
     public function update(User $user, TicketFeedback $ticketFeedback): bool
     {
-        if ($user->role_id === 3) {
-            return $ticketFeedback->admin_id === $user->id;
-        }
-        if ($user->role_id === 2) {
-            return $user->id === $ticketFeedback->user_id;
-        }
-        return true;
+        return $user->can('update_ticket::feedback');
     }
 
     /**

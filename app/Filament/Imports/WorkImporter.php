@@ -4,75 +4,198 @@ namespace App\Filament\Imports;
 
 use App\Models\Work;
 use Illuminate\Support\Facades\DB;
-use Filament\Actions\Imports\Importer;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Filament\Actions\Imports\ImportColumn;
-use Maatwebsite\Excel\Events\BeforeImport;
-use Filament\Actions\Imports\Models\Import;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
+use Illuminate\Support\Collection;
 
 HeadingRowFormatter::default('none');
 
-class WorkImporter extends Importer implements WithHeadingRow, withStartRow, ToModel,
-WithBatchInserts
+class WorkImporter implements WithHeadingRow, WithStartRow, ToCollection, WithBatchInserts
 {
-    protected static ?string $model = Work::class;
-
     public function startRow(): int
     {
         return 2; // Mulai membaca dari baris ke-2 (setelah header)
     }
-    
 
     protected $columnMapping = [
-        'Tahun' => 'year',
+        'No. Kontrak' => 'contract_number',
         'Nama Paket' => 'name',
-        'Tanggal Kontrak' => 'contract_date',
-        'Nomor Kontrak' => 'contract_number',
-        'ID Kontraktor' => 'contractor',
-        'ID Konsultan Perencana' => 'consultant',
-        'ID Konsultan Pengawas' => 'supervisor',
-        'Nilai Kontrak' => 'contract_value',
-        'Kemajuan Pelaksanaan Fisik' => 'progress',
-        'Tanggal Cut Off / Selesai' => 'cutoff',
-        'Status Pelaksanaan' => 'status',
-        'Jumlah Terbayar' => 'paid',
+        'ID Kecamatan' => 'district_id',
+        'ID Desa' => 'village_id',
+        'RT' => 'rt',
+        'Lebar' => 'width',
+        'Panjang' => 'length',
+        'Konstruksi' => 'construction_type',
+        'Telepon' => 'phone',
+        'Koordinat Latitude' => 'coordinate_lat',
+        'Koordinat Longitude' => 'coordinate_lng',
+        'Kode Rekening' => 'account_code',
+        'Program' => 'program',
+        'Sumber' => 'source',
+        'Tahun' => 'year',
+        'ID Kontraktor' => 'contractor_id',
+        'ID Konsultan Perencana' => 'consultant_id',
+        'ID Konsultan Pengawas' => 'supervisor_id',
+        'ID Tim Teknis' => 'technical_team',
+        'ID Pejabat Pengadaan' => 'procurement_officer_id',
+        'Masa (hari)' => 'duration',
+        'HPS' => 'hps',
+        'Nilai Penawaran' => 'bid_value',
+        'Koreksi Aritmatik' => 'correction_value',
+        'Harga Nego' => 'nego_value',
+        'Tanggal Undangan' => 'invite_date',
+        'Tanggal Evaluasi' => 'evaluation_date',
+        'Tanggal Negosiasi' => 'nego_date',
+        'Tanggal BA-HPL' => 'bahpl_date',
+        'Tanggal SPPBJ' => 'sppbj_date',
+        'Tanggal SPK' => 'spk_date',
+        'Nomor Addendum' => 'add_number',
+        'Nilai Addendum' => 'addendum_value',
+        'Tanggal Addendum' => 'addendum_date',
+        'Surat Keterangan Selesai' => 'completion_letter',
+        'Tanggal Selesai' => 'completion_date',
+        'Tanggal PHO' => 'pho_date',
+        'No BAP Uang Muka' => 'advance_bap_number',
+        'No. Jaminan Uang Muka' => 'advance_guarantee_number',
+        'Penjamin Uang Muka' => 'advance_guarantor',
+        'Tanggal Jaminan Uang Muka' => 'advance_guarantee_date',
+        'Nilai Uang Muka' => 'advance_value',
+        'Tanggal Pembayaran Uang Muka' => 'advance_payment_date',
+        'No BAP Pelunasan' => 'final_bap_number',
+        'No. Jaminan Pemeliharaan' => 'maintenance_guarantee_number',
+        'Penjamin Pelunasan' => 'final_guarantor',
+        'Tanggal Jaminan Pelunasan' => 'final_guarantee_date',
+        'Nilai Jaminan Pelunasan' => 'final_guarantee_value',
+        'Tanggal Pembayaran Pelunasan' => 'final_payment_date',
     ];
 
-    public function model(array $row)
+    protected $technicalTeamMapping = [];
+
+    public function collection(Collection $collection)
     {
-        $mappedRow = [];
-        foreach ($this->columnMapping as $excelColumn => $dbColumn) {
-            $cleanedColumn = trim($excelColumn);
-            $mappedRow[$dbColumn] = $row[$cleanedColumn] ?? null;
-        }
-        
-        \Log::info('Processing row:', $mappedRow);
+        DB::transaction(function () use ($collection) {
+            foreach ($collection as $row) {
+                $workData = $this->processRow($row->toArray());
+                if ($workData) {
+                    Log::info('Creating work with data:', $workData['work_data']);
 
-       
+                    $work = Work::create($workData['work_data']);
 
+                    Log::info('Work created with ID: ' . $work->id);
+
+                    // Handle Tim Teknis relationship
+                    if (!empty($workData['technical_team_ids'])) {
+                        Log::info('Syncing officers for work ID ' . $work->id, $workData['technical_team_ids']);
+
+                        $syncResult = $work->officers()->sync($workData['technical_team_ids']);
+
+                        Log::info('Sync result:', $syncResult);
+
+                        // Verifikasi apakah sync berhasil
+                        $work->refresh();
+                        $attachedOfficers = $work->officers()->pluck('name')->toArray();
+
+                        Log::info('Attached officers after sync for work ID ' . $work->id . ':', $attachedOfficers);
+                    } else {
+                        Log::info('No technical team IDs to sync for work ID: ' . $work->id);
+                    }
+                }
+            }
+        });
+    }
+
+    protected function processRow(array $row)
+    {
         try {
-            return new Work([
-                'year' => $mappedRow['year'],
-                'name' => $mappedRow['name'],
-                'contract_date' => is_numeric($mappedRow['contract_date']) ? \Carbon\Carbon::createFromFormat('Y-m-d', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($mappedRow['contract_date'])->format('Y-m-d')) : (!empty($mappedRow['contract_date']) ? \Carbon\Carbon::parse($mappedRow['contract_date']) : null),
-                'contract_number' => $mappedRow['contract_number'] ?? null,
-                'contractor_id' => !empty($mappedRow['contractor']) ? DB::table('contractors')->where('id', $mappedRow['contractor'])->value('id') : null,
-                'consultant_id' => !empty($mappedRow['consultant']) ? DB::table('consultants')->where('id', $mappedRow['consultant'])->value('id') : null,
-                'supervisor_id' => !empty($mappedRow['supervisor']) ? DB::table('consultants')->where('id', $mappedRow['supervisor'])->value('id') : null,
-                'contract_value' => $mappedRow['contract_value'] ?? null,
-                'progress' => $mappedRow['progress'] ?? null,
-                'cutoff' => is_numeric($mappedRow['cutoff']) ? \Carbon\Carbon::createFromFormat('Y-m-d', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($mappedRow['cutoff'])->format('Y-m-d')) : (!empty($mappedRow['cutoff']) ? \Carbon\Carbon::parse($mappedRow['cutoff']) : null),
-                'status' => $mappedRow['status'],
-                'paid' => $mappedRow['paid'] ?? null,
-            ]);
+            Log::info('Processing work row:', $row);
+
+            $mappedRow = [];
+            foreach ($this->columnMapping as $excelColumn => $dbColumn) {
+                $cleanedColumn = trim($excelColumn);
+                $mappedRow[$dbColumn] = $row[$cleanedColumn] ?? null;
+            }
+
+            Log::info('Mapped work data:', $mappedRow);
+
+            // Skip empty rows
+            if (empty(array_filter($mappedRow))) {
+                Log::info('Skipping empty work row');
+                return null;
+            }
+
+            // Handle Tim Teknis (multiple IDs separated by comma)
+            $technicalTeamIds = [];
+            if (!empty($mappedRow['technical_team'])) {
+                $teamIds = array_map('trim', explode(',', $mappedRow['technical_team']));
+
+                foreach ($teamIds as $teamId) {
+                    if (!empty($teamId) && is_numeric($teamId)) {
+                        $validId = DB::table('officers')->where('id', $teamId)->value('id');
+                        if ($validId) {
+                            $technicalTeamIds[] = $validId;
+                        }
+                    }
+                }
+            }
+
+            // Remove technical_team dari work data dan simpan untuk relasi
+            unset($mappedRow['technical_team']);
+
+            // Handle date fields
+            $dateFields = [
+                'invite_date', 'evaluation_date', 'nego_date', 'bahpl_date',
+                'sppbj_date', 'spk_date', 'addendum_date', 'completion_date',
+                'pho_date', 'advance_guarantee_date', 'advance_payment_date',
+                'final_guarantee_date', 'final_payment_date'
+            ];
+
+            foreach ($dateFields as $dateField) {
+                if (!empty($mappedRow[$dateField])) {
+                    $mappedRow[$dateField] = is_numeric($mappedRow[$dateField]) ?
+                        \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($mappedRow[$dateField])->format('Y-m-d') :
+                        \Carbon\Carbon::parse($mappedRow[$dateField])->format('Y-m-d');
+                }
+            }
+
+            // Handle relationship IDs - validate they exist
+            if (!empty($mappedRow['district_id'])) {
+                $mappedRow['district_id'] = DB::table('districts')->where('id', $mappedRow['district_id'])->value('id');
+            }
+
+            if (!empty($mappedRow['village_id'])) {
+                $mappedRow['village_id'] = DB::table('villages')->where('id', $mappedRow['village_id'])->value('id');
+            }
+
+            if (!empty($mappedRow['contractor_id'])) {
+                $mappedRow['contractor_id'] = DB::table('contractors')->where('id', $mappedRow['contractor_id'])->value('id');
+            }
+
+            if (!empty($mappedRow['consultant_id'])) {
+                $mappedRow['consultant_id'] = DB::table('consultants')->where('id', $mappedRow['consultant_id'])->value('id');
+            }
+
+            if (!empty($mappedRow['supervisor_id'])) {
+                $mappedRow['supervisor_id'] = DB::table('consultants')->where('id', $mappedRow['supervisor_id'])->value('id');
+            }
+
+            if (!empty($mappedRow['procurement_officer_id'])) {
+                $mappedRow['procurement_officer_id'] = DB::table('procurement_officers')->where('id', $mappedRow['procurement_officer_id'])->value('id');
+            }
+
+            return [
+                'work_data' => $mappedRow,
+                'technical_team_ids' => $technicalTeamIds
+            ];
         } catch (\Exception $e) {
-            \Log::error('Error processing row:', [
-                'row' => $mappedRow,
-                'error' => $e->getMessage()
+            Log::error('Error processing work row:', [
+                'row' => $row,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             throw $e;
         }
@@ -81,115 +204,5 @@ WithBatchInserts
     public function batchSize(): int
     {
         return 100;
-    }
-
-    public static function getColumns(): array
-    {
-        return [
-            ImportColumn::make('year')
-                ->label('Tahun')
-                ->requiredMapping()
-                ->numeric(),
-            ImportColumn::make('name')
-                ->label('Nama Paket')
-                ->requiredMapping(),
-            ImportColumn::make('contract_date')
-                ->label('Tanggal Kontrak')
-                ->rules(['nullable']),
-            ImportColumn::make('contract_number')
-                ->label('Nomor Kontrak'),
-            ImportColumn::make('contractor')
-                ->label('ID Kontraktor')
-                ->relationship()
-                ->rules(['nullable']),
-            ImportColumn::make('consultant')
-                ->label('ID Konsultan Perencana')
-                ->relationship()
-                ->rules(['nullable']),
-            ImportColumn::make('supervisor')
-                ->label('ID Konsultan Pengawas')
-                ->relationship()
-                ->rules(['nullable']),
-            ImportColumn::make('contract_value')
-                ->label('Nilai Kontrak')
-                ->numeric(),
-            ImportColumn::make('progress')
-                ->label('Kemajuan Pelaksanaan Fisik')
-                ->numeric(),
-            ImportColumn::make('cutoff')
-                ->label('Tanggal Cut Off / Selesai')
-                ->rules(['nullable']),
-            ImportColumn::make('status')
-                ->label('Status Pelaksanaan')
-                ->requiredMapping(),
-            ImportColumn::make('paid')
-                ->label('Jumlah Terbayar')
-                ->numeric(),
-        ];
-    }
-
-
-    public function resolveRecord(): ?Work
-    {
-        try {
-            DB::beginTransaction();
-
-            \Log::info('Raw data received:', $this->data);
-            
-            // Validasi data yang diterima
-            if (empty($this->data)) {
-                \Log::warning('No data received in resolveRecord');
-                return null;
-            }
-
-            // Map the Excel columns to database fields
-            $work = new Work([
-                'year' => $this->data['year'] ?? null,
-                'name' => $this->data['name'] ?? null,
-                'contract_date' => !empty($this->data['contract_date']) ? \Carbon\Carbon::parse($this->data['contract_date']) : null,
-                'contract_number' => $this->data['contract_number'] ?? null,
-                'contractor' => $this->data['contractor'] ?? null,
-                'consultant' => $this->data['consultant'] ?? null,
-                'supervisor' => $this->data['supervisor'] ?? null,
-                'contract_value' => $this->data['contract_value'] ?? null,
-                'progress' => $this->data['progress'] ?? null,
-                'cutoff' => !empty($this->data['cutoff']) ? \Carbon\Carbon::parse($this->data['cutoff']) : null,
-                'status' => $this->data['status'] ?? null,
-                'paid' => $this->data['paid'] ?? null,
-            ]);
-
-            \Log::info('Mapped work data:', $work->toArray());
-            
-            $work->save();
-            
-            DB::commit();
-            
-            return $work;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Error in resolveRecord: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            throw $e;
-        }
-    }
-
-
-    public static function getCompletedNotificationBody(Import $import): string
-    {
-        return "Successfully imported {$import->successful_rows} works.";
-    }
-
-    public function chunkSize(): int
-    {
-        return 100;
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            BeforeImport::class => function(BeforeImport $event) {
-                \Log::info('Excel headers:', $event->getDelegate()->getActiveSheet()->toArray()[0]);
-            },
-        ];
     }
 }
