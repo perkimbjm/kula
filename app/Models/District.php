@@ -63,13 +63,4 @@ class District extends Model
         return $this->hasMany(Survey::class);
     }
 
-    public function pokirs(): HasMany
-    {
-        return $this->hasMany(Pokir::class);
-    }
-
-    public function musrenbangs(): HasMany
-    {
-        return $this->hasMany(Musrenbang::class);
-    }
 }

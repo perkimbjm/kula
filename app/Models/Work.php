@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Facility;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Work extends Model
 {
@@ -209,5 +211,10 @@ class Work extends Model
     public function getTechnicalTeamStringAttribute()
     {
         return $this->officers ? $this->officers->pluck('name')->implode(', ') : '-';
+    }
+
+    public function facilities(): HasMany
+    {
+        return $this->hasMany(Facility::class);
     }
 }

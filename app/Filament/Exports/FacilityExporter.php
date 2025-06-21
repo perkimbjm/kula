@@ -2,20 +2,15 @@
 
 namespace App\Filament\Exports;
 
-use App\Models\Village;
-use App\Models\District;
 use App\Models\Facility;
-use Filament\Forms\Components\Select;
-use Filament\Actions\Exports\Exporter;
+use App\Enums\ProgressStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Filament\Actions\Exports\ExportColumn;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Filament\Actions\Exports\Models\Export;
 
 class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
 {
@@ -23,6 +18,7 @@ class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAu
 
     protected $filters;
     protected $selectedColumns;
+    protected static $number = 1;
 
     public function __construct(array $filters = [], array $selectedColumns = [])
     {
@@ -32,70 +28,97 @@ class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAu
 
     public function query()
     {
-        $query = Facility::query()->with(['contractor', 'consultant', 'district', 'village']);
-        
-        if (isset($this->filters['contractor']['value'])) {
-            $query->where('contractor_id', $this->filters['contractor']['value']);
+        $query = Facility::query()->with([
+            'work',
+            'work.district',
+            'work.village',
+            'work.procurementOfficer',
+            'work.officers'
+        ]);
+
+        // Apply filters if provided
+        if (isset($this->filters['work_id']['value'])) {
+            $query->where('work_id', $this->filters['work_id']['value']);
         }
 
-        if (isset($this->filters['district_id']['value'])) {
-            $query->where('district_id', $this->filters['district_id']['value']);
+        if (isset($this->filters['progress_status']['value'])) {
+            $query->where('progress_status', $this->filters['progress_status']['value']);
         }
-    
-        if (isset($this->filters['village_id']['value'])) {
-            $query->where('village_id', $this->filters['village_id']['value']);
-        }
-        
+
         return $query;
     }
 
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('id')
-                ->label('ID'),
-            ExportColumn::make('name')
-                ->label('Nama'),
-            ExportColumn::make('contractor.name')
-                ->label('Kontraktor'),
-            ExportColumn::make('consultant.name')
-                ->label('Konsultan'),
-            ExportColumn::make('district.name')
+            ExportColumn::make('no')
+                ->label('No'),
+            ExportColumn::make('work.contract_number')
+                ->label('No. Kontrak'),
+            ExportColumn::make('work.name')
+                ->label('Nama Paket'),
+            ExportColumn::make('work.technical_team_string')
+                ->label('Tim Teknis'),
+            ExportColumn::make('work.procurementOfficer.name')
+                ->label('Pejabat Pengadaan'),
+            ExportColumn::make('work.district.name')
                 ->label('Kecamatan'),
-            ExportColumn::make('village.name')
-                ->label('Kelurahan / Desa'),
+            ExportColumn::make('work.village.name')
+                ->label('Desa'),
+            ExportColumn::make('rt')
+                ->label('RT'),
             ExportColumn::make('length')
                 ->label('Panjang (m)'),
             ExportColumn::make('width')
-                ->label('Lebar'),
-            ExportColumn::make('lat'),
-            ExportColumn::make('lng'),
-            ExportColumn::make('real_1')
-                ->label('Realisasi Fisik Pekan ke-1'),
-            ExportColumn::make('real_2')
-                ->label('Realisasi Fisik Pekan ke-2'),
-            ExportColumn::make('real_3')
-                ->label('Realisasi Fisik Pekan ke-3'),
-            ExportColumn::make('real_4')
-                ->label('Realisasi Fisik Pekan ke-4'),
-            ExportColumn::make('real_5')
-                ->label('Realisasi Fisik Pekan ke-5'),
-            ExportColumn::make('real_6')
-                ->label('Realisasi Fisik Pekan ke-6'),
-            ExportColumn::make('real_7')
-                ->label('Realisasi Fisik Pekan ke-7'),
-            ExportColumn::make('real_8')
-                ->label('Realisasi Fisik Pekan ke-8'),
-            ExportColumn::make('note')
-                ->label('Catatan Pengawas'),
-            ExportColumn::make('note_pho')
-                ->label('Catatan PHO'),
-            ExportColumn::make('team')
-                ->label('Tim PHO'),
+                ->label('Lebar (m)'),
+            ExportColumn::make('phone')
+                ->label('Telepon'),
             ExportColumn::make('construct_type')
-                ->label('Jenis Konstruksi'),
-            ExportColumn::make('spending_type')
-                ->label('Jenis Belanja'),
+                ->label('Konstruksi'),
+            ExportColumn::make('lat')
+                ->label('Latitude'),
+            ExportColumn::make('lng')
+                ->label('Longitude'),
+            ExportColumn::make('progress_status')
+                ->label('Progress Status'),
+            ExportColumn::make('real_1')
+                ->label('Progress Minggu 1'),
+            ExportColumn::make('real_2')
+                ->label('Progress Minggu 2'),
+            ExportColumn::make('real_3')
+                ->label('Progress Minggu 3'),
+            ExportColumn::make('real_4')
+                ->label('Progress Minggu 4'),
+            ExportColumn::make('real_5')
+                ->label('Progress Minggu 5'),
+            ExportColumn::make('real_6')
+                ->label('Progress Minggu 6'),
+            ExportColumn::make('note')
+                ->label('Catatan Konsultan'),
+            ExportColumn::make('photo_0_url')
+                ->label('Foto 1 URL'),
+            ExportColumn::make('photo_50_url')
+                ->label('Foto 2 URL'),
+            ExportColumn::make('photo_100_url')
+                ->label('Foto 3 URL'),
+            ExportColumn::make('photo_pho_url')
+                ->label('Foto 4 URL'),
+            ExportColumn::make('shop_drawing_url')
+                ->label('Shop Drawing URL'),
+            ExportColumn::make('asbuilt_drawing_url')
+                ->label('Asbuilt Drawing URL'),
+            ExportColumn::make('rab_url')
+                ->label('RAB URL'),
+            ExportColumn::make('laporan_url')
+                ->label('Laporan URL'),
+            ExportColumn::make('file_shp_url')
+                ->label('File SHP URL'),
+            ExportColumn::make('file_konsultan_perencana_url')
+                ->label('File Konsultan Perencana URL'),
+            ExportColumn::make('file_konsultan_pengawas_url')
+                ->label('File Konsultan Pengawas URL'),
+            ExportColumn::make('file_kontraktor_pelaksana_url')
+                ->label('File Kontraktor Pelaksana URL'),
         ];
     }
 
@@ -114,7 +137,7 @@ class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAu
         })->toArray();
     }
 
-    public function map($row): array
+    public function map($facility): array
     {
         $columns = collect(self::getColumns());
 
@@ -124,26 +147,47 @@ class FacilityExporter implements FromQuery, WithHeadings, WithMapping, ShouldAu
             });
         }
 
-        return $columns->map(function ($column) use ($row) {
+        $row = $columns->map(function ($column) use ($facility) {
             $field = $column->getName();
 
-            // Jika kolom adalah 'team' dan datanya array, ubah menjadi string dipisahkan koma
-            if ($field === 'team' && is_array($row->$field)) {
-                return implode(', ', $row->$field);
+            if ($field === 'no') {
+                return self::$number++;
             }
 
-            if (str_contains($field, '.')) {
-                $relations = explode('.', $field);
-                $value = $row;
-                foreach ($relations as $relation) {
-                    $value = $value->$relation ?? null;
-                }
-                return $value;
+            // Handle progress status enum
+            if ($field === 'progress_status') {
+                return $facility->progress_status ? $facility->progress_status->getLabel() : '';
             }
 
-            return $row->$field ?? null;
+            // Handle relationship fields
+            if ($field === 'work.technical_team_string') {
+                return $facility->work ? $facility->work->technical_team_string : '';
+            }
+
+            if ($field === 'work.contract_number') {
+                return $facility->work ? $facility->work->contract_number : '';
+            }
+
+            if ($field === 'work.name') {
+                return $facility->work ? $facility->work->name : '';
+            }
+
+            if ($field === 'work.district.name') {
+                return $facility->work && $facility->work->district ? $facility->work->district->name : '';
+            }
+
+            if ($field === 'work.village.name') {
+                return $facility->work && $facility->work->village ? $facility->work->village->name : '';
+            }
+
+            if ($field === 'work.procurementOfficer.name') {
+                return $facility->work && $facility->work->procurementOfficer ? $facility->work->procurementOfficer->name : '';
+            }
+
+            // Default field access
+            return $facility->$field ?? '';
         })->toArray();
-    }
 
-    
+        return $row;
+    }
 }
