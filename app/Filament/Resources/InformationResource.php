@@ -46,7 +46,7 @@ class InformationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->selectable()            ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('info_url')

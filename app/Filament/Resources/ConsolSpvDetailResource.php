@@ -51,7 +51,7 @@ class ConsolSpvDetailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->selectable()            ->columns([
                 Tables\Columns\TextColumn::make('consolidation.id')
                     ->numeric()
                     ->sortable(),

@@ -35,9 +35,6 @@ class Work extends Model
         'contractor_id',
         'consultant_id',
         'supervisor_id',
-        'progress',
-        'status',
-        'paid',
         'district_id',
         'village_id',
         'rt',
@@ -95,9 +92,6 @@ class Work extends Model
         'consultant_id' => 'integer',
         'supervisor_id' => 'integer',
         'contract_value' => 'float',
-        'progress' => 'float',
-        'cutoff' => 'date',
-        'paid' => 'float',
         'district_id' => 'integer',
         'village_id' => 'integer',
         'length' => 'float',
@@ -177,16 +171,6 @@ class Work extends Model
             'officers:id,name',
             'procurementOfficer:id,name'
         ]);
-    }
-
-    /**
-     * Scope untuk dashboard/summary views
-     */
-    public function scopeForDashboard(Builder $query): Builder
-    {
-        return $query->select('id', 'name', 'progress', 'status', 'updated_at')
-            ->with(['contractor:id,name'])
-            ->orderBy('updated_at', 'desc');
     }
 
     /**

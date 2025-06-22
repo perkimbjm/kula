@@ -31,6 +31,7 @@ class AuditLogResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->selectable()
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nama Pengguna')

@@ -25,6 +25,8 @@ use Dotswan\MapPicker\Fields\Map;
 use App\Filament\Resources\FacilityResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\FacilityResource\RelationManagers;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Log;
 
 
 class FacilityResource extends Resource
@@ -124,76 +126,89 @@ class FacilityResource extends Resource
                         ->maxLength(255)
                         ->columnSpan(2),
 
-                    Forms\Components\Grid::make(2)
-                        ->schema([
-                            Forms\Components\TextInput::make('lat')
-                                ->label('Latitude')
-                                ->placeholder('-2.3357594')
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                    if ($state) {
-                                        // Pastikan format menggunakan dot, bukan koma
-                                        $formatted = str_replace(',', '.', $state);
-                                        $set('lat', $formatted);
-                                        $set('location', [
-                                            'lat' => (float)$formatted,
-                                            'lng' => (float)($get('lng') ?? 115.460096),
-                                        ]);
-                                    }
-                                }),
-                            Forms\Components\TextInput::make('lng')
-                                ->label('Longitude')
-                                ->placeholder('115.460096')
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                    if ($state) {
-                                        // Pastikan format menggunakan dot, bukan koma
-                                        $formatted = str_replace(',', '.', $state);
-                                        $set('lng', $formatted);
-                                        $set('location', [
-                                            'lat' => (float)($get('lat') ?? -2.3357594),
-                                            'lng' => (float)$formatted,
-                                        ]);
-                                    }
-                                }),
-                        ])
-                        ->columnSpan(2),
+                    // Hidden fields untuk MapPicker (sesuai dokumentasi)
+                    TextInput::make('latitude')
+                        ->hiddenLabel()
+                        ->hidden(),
+                    TextInput::make('longitude')
+                        ->hiddenLabel()
+                        ->hidden(),
+
+                    TextInput::make('lat')
+                        ->label('Latitude')
+                        ->placeholder('Contoh: -2.33668')
+                        ->reactive()
+                        ->afterStateUpdated(function (Set $set, Get $get, $state, $livewire): void {
+                             $lng = $get('lng');
+                             if ($state && $lng && is_numeric($state) && is_numeric($lng)) {
+                                 $set('location', ['lat' => (string)$state, 'lng' => (string)$lng]);
+                                 $set('latitude', (string)$state);  // Sync ke hidden field
+                                 $set('longitude', (string)$lng);   // Sync ke hidden field
+                                 $livewire->dispatch('refreshMap');
+                             }
+                         })
+                        ->rules(['nullable', 'numeric', 'between:-90,90']),
+
+                    TextInput::make('lng')
+                        ->label('Longitude')
+                        ->placeholder('Contoh: 115.46028')
+                        ->reactive()
+                        ->afterStateUpdated(function (Set $set, Get $get, $state, $livewire): void {
+                             $lat = $get('lat');
+                             if ($state && $lat && is_numeric($state) && is_numeric($lat)) {
+                                 $set('location', ['lat' => (string)$lat, 'lng' => (string)$state]);
+                                 $set('latitude', (string)$lat);    // Sync ke hidden field
+                                 $set('longitude', (string)$state); // Sync ke hidden field
+                                 $livewire->dispatch('refreshMap');
+                             }
+                         })
+                        ->rules(['nullable', 'numeric', 'between:-180,180']),
 
                     Map::make('location')
-                        ->label('Lokasi (Klik pada peta untuk mengatur koordinat)')
+                        ->label('Pilih Lokasi di Peta')
                         ->columnSpanFull()
-                        ->defaultLocation(latitude: -2.3357594, longitude: 115.460096)
-                        ->reactive()
+                        ->defaultLocation(latitude: -2.33668, longitude: 115.46028)
                         ->afterStateUpdated(function (Set $set, ?array $state): void {
+                            // Debug: Log state untuk troubleshooting
+                            Log::info('FacilityResource MapPicker afterStateUpdated:', $state ?? []);
+
                             if ($state && isset($state['lat']) && isset($state['lng'])) {
-                                // Format koordinat dengan 7 digit desimal dan dot separator
-                                $lat = number_format((float)$state['lat'], 7, '.', '');
-                                $lng = number_format((float)$state['lng'], 7, '.', '');
+                                // Cast ke string untuk konsistensi dengan database
+                                $lat = (string) $state['lat'];
+                                $lng = (string) $state['lng'];
+
+                                // Set ke field yang visible
                                 $set('lat', $lat);
                                 $set('lng', $lng);
+
+                                // Set ke hidden fields untuk MapPicker
+                                $set('latitude', $lat);
+                                $set('longitude', $lng);
+
+                                // Debug: Log koordinat yang di-set
+                                Log::info('FacilityResource Setting coordinates:', ['lat' => $lat, 'lng' => $lng]);
                             }
                         })
                         ->afterStateHydrated(function ($state, $record, Set $set): void {
-                            if ($record && isset($record->lat) && isset($record->lng)) {
+                            if ($record && $record->lat && $record->lng) {
                                 $set('location', [
-                                    'lat' => (float)$record->lat,
-                                    'lng' => (float)$record->lng
+                                    'lat' => $record->lat,
+                                    'lng' => $record->lng
                                 ]);
+                                // Sync ke hidden fields juga
+                                $set('latitude', $record->lat);
+                                $set('longitude', $record->lng);
                             }
                         })
-                        ->extraStyles([
-                            'min-height: 50vh',
-                        ])
-                        ->liveLocation(true, true, 120000)
                         ->showMarker()
-                        ->markerColor("#22c55eff")
-                        ->showFullscreenControl()
+                        ->draggable(true)
+                        ->clickable(true)
+                        ->showMyLocationButton(true)
                         ->showZoomControl()
-                        ->draggable()
-                        ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png")
+                        ->showFullscreenControl()
+                        ->liveLocation(false, false, 5000)
                         ->zoom(15)
-                        ->detectRetina()
-                        ->showMyLocationButton(),
+                        ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png"),
                 ])
                 ->columns(2),
 
@@ -262,9 +277,9 @@ class FacilityResource extends Resource
             Section::make('Dokumentasi Foto')
                 ->schema([
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('photo_0')
+                    Forms\Components\FileUpload::make('photo_0')
                             ->label('Foto 1 (File)')
-                            ->image()
+                        ->image()
                             ->imageEditor()
                             ->directory('facility/photos')
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
@@ -279,9 +294,9 @@ class FacilityResource extends Resource
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('photo_50')
+                    Forms\Components\FileUpload::make('photo_50')
                             ->label('Foto 2 (File)')
-                            ->image()
+                        ->image()
                             ->imageEditor()
                             ->directory('facility/photos')
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
@@ -296,9 +311,9 @@ class FacilityResource extends Resource
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('photo_100')
+                    Forms\Components\FileUpload::make('photo_100')
                             ->label('Foto 3 (File)')
-                            ->image()
+                        ->image()
                             ->imageEditor()
                             ->directory('facility/photos')
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
@@ -313,9 +328,9 @@ class FacilityResource extends Resource
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('photo_pho')
+                    Forms\Components\FileUpload::make('photo_pho')
                             ->label('Foto 4 (File)')
-                            ->image()
+                        ->image()
                             ->imageEditor()
                             ->directory('facility/photos')
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
@@ -402,7 +417,7 @@ class FacilityResource extends Resource
                     Forms\Components\Group::make([
                         Forms\Components\FileUpload::make('laporan')
                             ->label('Laporan (Multi File)')
-                            ->multiple()
+                        ->multiple()
                             ->reorderable()
                             ->appendFiles()
                             ->maxFiles(10)

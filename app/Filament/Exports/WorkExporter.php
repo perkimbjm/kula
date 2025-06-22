@@ -29,10 +29,6 @@ class WorkExporter implements FromQuery, WithHeadings, WithMapping, ShouldAutoSi
         $query = Work::forExport();
 
         // Apply filters if provided
-        if (isset($this->filters['status']['value'])) {
-            $query->where('status', $this->filters['status']['value']);
-        }
-
         if (isset($this->filters['contractor']['value'])) {
             $query->where('contractor_id', $this->filters['contractor']['value']);
         }

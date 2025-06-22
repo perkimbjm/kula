@@ -1180,16 +1180,16 @@
         },
         {
             "name": "dotswan/filament-map-picker",
-            "version": "v1.7.1",
+            "version": "v1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dotswan/filament-map-picker.git",
-                "reference": "be9c68d34696869f6e74d3f27714abf1d0beaaec"
+                "reference": "ae39b0cf68642bae7fe3d021537cc1bd8e2ae9bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dotswan/filament-map-picker/zipball/be9c68d34696869f6e74d3f27714abf1d0beaaec",
-                "reference": "be9c68d34696869f6e74d3f27714abf1d0beaaec",
+                "url": "https://api.github.com/repos/dotswan/filament-map-picker/zipball/ae39b0cf68642bae7fe3d021537cc1bd8e2ae9bd",
+                "reference": "ae39b0cf68642bae7fe3d021537cc1bd8e2ae9bd",
                 "shasum": ""
             },
             "require": {
@@ -1253,7 +1253,7 @@
                 "issues": "https://github.com/dotswan/filament-map-picker/issues",
                 "source": "https://github.com/dotswan/filament-map-picker"
             },
-            "time": "2024-12-30T09:20:56+00:00"
+            "time": "2025-02-19T17:12:24+00:00"
         },
         {
             "name": "dragonmantank/cron-expression",

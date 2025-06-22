@@ -120,7 +120,7 @@ class SpvResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->selectable()            ->columns([
                 // NAMA PAKET
                 Tables\Columns\TextColumn::make('id')
                     ->label('No')

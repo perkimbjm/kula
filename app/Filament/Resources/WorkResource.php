@@ -6,14 +6,12 @@ use Filament\Forms;
 use App\Models\Work;
 use Filament\Tables;
 use Filament\Forms\Form;
-use App\Enums\WorkStatus;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Filament\Imports\WorkImporter;
-use App\Tables\Columns\ProgressColumn;
 use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\FilteredWorkExport;
@@ -21,6 +19,9 @@ use App\Filament\Resources\WorkResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\WorkResource\RelationManagers;
 use Illuminate\Support\Facades\Cache;
+use Filament\Forms\Set;
+use Filament\Forms\Get;
+use Dotswan\MapPicker\Fields\Map;
 
 
 class WorkResource extends Resource
@@ -92,10 +93,65 @@ class WorkResource extends Resource
                 Forms\Components\Fieldset::make('Koordinat')->schema([
                     Forms\Components\TextInput::make('coordinate_lat')
                         ->label('Latitude')
-                        ->placeholder('Contoh: -7.250445'),
+                        ->placeholder('Contoh: -7.250445')
+                        ->numeric()
+                        ->step('any')
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                            if ($state) {
+                                $set('location', [
+                                    'lat' => (float) $state,
+                                    'lng' => (float) ($get('coordinate_lng') ?? 0),
+                                ]);
+                            }
+                        }),
                     Forms\Components\TextInput::make('coordinate_lng')
                         ->label('Longitude')
-                        ->placeholder('Contoh: 112.768845'),
+                        ->placeholder('Contoh: 112.768845')
+                        ->numeric()
+                        ->step('any')
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                            if ($state) {
+                                $set('location', [
+                                    'lat' => (float) ($get('coordinate_lat') ?? 0),
+                                    'lng' => (float) $state,
+                                ]);
+                            }
+                        }),
+
+                    Map::make('location')
+                        ->label('Lokasi Proyek')
+                        ->columnSpanFull()
+                        ->defaultLocation(latitude: -2.3357594, longitude: 115.460096)
+                        ->reactive()
+                        ->afterStateUpdated(function (Set $set, ?array $state): void {
+                            if ($state && isset($state['lat']) && isset($state['lng'])) {
+                                $set('coordinate_lat', $state['lat']);
+                                $set('coordinate_lng', $state['lng']);
+                            }
+                        })
+                        ->afterStateHydrated(function ($state, $record, Set $set): void {
+                            if ($record && isset($record->coordinate_lat) && isset($record->coordinate_lng)) {
+                                $set('location', [
+                                    'lat' => $record->coordinate_lat,
+                                    'lng' => $record->coordinate_lng
+                                ]);
+                            }
+                        })
+                        ->extraStyles([
+                            'min-height: 65vh',
+                        ])
+                        ->liveLocation(false)
+                        ->showMarker()
+                        ->markerColor("#22c55eff")
+                        ->showFullscreenControl()
+                        ->showZoomControl()
+                        ->draggable()
+                        ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png")
+                        ->zoom(15)
+                        ->detectRetina()
+                        ->showMyLocationButton(),
                 ]),
 
 
@@ -232,34 +288,13 @@ class WorkResource extends Resource
                     Forms\Components\DatePicker::make('final_payment_date')
                         ->label('Tanggal Pembayaran'),
                 ]),
-
-
-                Forms\Components\Fieldset::make('Realisasi Fisik dan Keuangan')->schema([
-                    Forms\Components\TextInput::make('progress')
-                        ->label('Progres Pekerjaan Fisik')
-                        ->suffix('%')
-                        ->numeric()
-                        ->minValue(0)
-                        ->maxValue(100)
-                        ->step(0.01)
-                        ->default(0),
-                    Forms\Components\Select::make('status')
-                        ->label('Status Pelaksanaan')
-                        ->enum(WorkStatus::class)
-                        ->options(WorkStatus::class)
-                        ->required()
-                        ->default('belum_kontrak'),
-                    Forms\Components\TextInput::make('paid')
-                        ->label('Jumlah Terbayar')
-                        ->prefix('Rp.')
-                        ->numeric(),
-                ]),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->selectable()
             ->modifyQueryUsing(fn (Builder $query) =>
                 $query->with([
                     'district:id,name',
@@ -475,18 +510,6 @@ class WorkResource extends Resource
                     ->label('Tanggal Pembayaran')
                     ->date('d M Y')
                     ->toggleable(isToggledHiddenByDefault: true),
-                ProgressColumn::make('progress')
-                    ->label('Progres Pekerjaan Fisik')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Status Pelaksanaan')
-                    ->formatStateUsing(fn($state): string => Str::headline($state))
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('paid')
-                    ->label('Jumlah Terbayar')
-                    ->prefix('Rp.')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -497,10 +520,6 @@ class WorkResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->options(WorkStatus::class)
-                    ->label('Status Pelaksanaan')
-                    ->default(null),
                 Tables\Filters\SelectFilter::make('contractor')
                     ->relationship('contractor', 'name')
                     ->label('Kontraktor')

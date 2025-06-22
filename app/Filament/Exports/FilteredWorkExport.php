@@ -14,7 +14,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class FilteredWorkExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize
 {
     use Exportable;
-    
+
     protected $filters;
     protected $selectedColumns;
 
@@ -29,23 +29,9 @@ class FilteredWorkExport implements FromQuery, WithHeadings, WithMapping, Should
     public function query()
     {
         $query = Work::query()->with(['contractor', 'consultant', 'supervisor']);
-        
-        if (isset($this->filters['cutoff'])) {
-            if (!empty($this->filters['cutoff']['contract_from'])) {
-                $query->whereDate('contract_date', '>=', $this->filters['cutoff']['contract_from']);
-            }
-
-            if (!empty($this->filters['cutoff']['contract_until'])) {
-                $query->whereDate('cutoff', '<=', $this->filters['cutoff']['contract_until']);
-            }
-        }
 
         if (isset($this->filters['contractor']['value'])) {
             $query->where('contractor_id', $this->filters['contractor']['value']);
-        }
-
-        if (isset($this->filters['status']['value'])) {
-            $query->where('status', $this->filters['status']['value']);
         }
 
         return $query;
@@ -66,20 +52,12 @@ class FilteredWorkExport implements FromQuery, WithHeadings, WithMapping, Should
                 ->label('Nomor Kontrak'),
             ExportColumn::make('contract_value')
                 ->label('Nilai Kontrak'),
-            ExportColumn::make('cutoff')
-                ->label('Tanggal Cut Off / Selesai'),
             ExportColumn::make('contractor.name')
                 ->label('Kontraktor'),
             ExportColumn::make('consultant.name')
                 ->label('Konsultan Perencana'),
             ExportColumn::make('supervisor.name')
                 ->label('Konsultan Pengawas'),
-            ExportColumn::make('progress')
-                ->label('Kemajuan Pelaksanaan Fisik'),
-            ExportColumn::make('status')
-                ->label('Status Pelaksanaan'),
-            ExportColumn::make('paid')
-                ->label('Terbayar'),
         ];
     }
 
@@ -124,7 +102,7 @@ class FilteredWorkExport implements FromQuery, WithHeadings, WithMapping, Should
                 return $value;
             }
 
-            if ($field === 'contract_date' || $field === 'cutoff') {
+            if ($field === 'contract_date') {
                 return $work->$field ? $work->$field->format('d-m-Y') : '';
             }
 

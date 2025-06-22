@@ -111,7 +111,7 @@ class TicketFeedbackResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(function (Builder $query) {
+            ->selectable()            ->query(function (Builder $query) {
                 $user = Auth::user();
                 $baseQuery = static::getModel()::query()->with(['ticket', 'user']);
                 

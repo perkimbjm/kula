@@ -131,7 +131,7 @@ class TicketResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->selectable()            ->columns([
                 Tables\Columns\TextColumn::make('ticket_number')
                     ->label('ID Ticket')
                     ->searchable(),

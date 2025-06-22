@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\Facility;
 use App\Models\Survey;
 use App\Models\Work;
+use App\Models\Track;
 use App\Models\TicketFeedback;
 use App\Models\TicketResponse;
 use Illuminate\Support\Carbon;
@@ -45,9 +46,15 @@ class StatsOverview extends BaseWidget
 
         // Statistik baru
         $surveyCount = Survey::count();
-        $totalWorkCount = Work::count();
-        $contractedCount = Work::where('status', 'kontrak')->count();
-        $completedCount = Work::where('status', 'selesai')->count();
+        $currentYear = now()->year;
+        $totalWorkCount = Work::whereYear('created_at', $currentYear)->count();
+
+        // Perhitungan berdasarkan tabel Track untuk tahun ini
+        $contractedCount = Track::where('kontrak', true)->whereYear('created_at', $currentYear)->count();
+        $completedCount = Track::where('selesai', true)->whereYear('created_at', $currentYear)->count();
+        $phoCount = Track::where('pho', true)->whereYear('created_at', $currentYear)->count();
+        $paymentProgressCount = Track::where('keuangan', true)->whereYear('created_at', $currentYear)->count();
+        $completedPackageCount = Track::where('bank', true)->where('laporan', true)->whereYear('created_at', $currentYear)->count();
 
         return [
             Stat::make('Total Pengguna', $userCount)
@@ -75,13 +82,25 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-map')
                 ->color('primary'),
             Stat::make('Total Berkontrak', $contractedCount)
-                ->description($totalWorkCount > 0 ? $contractedCount . ' dari ' . $totalWorkCount . ' paket dalam kontrak' : 'Jumlah proyek dalam kontrak')
+                ->description('Jumlah paket sudah berkontrak tahun ' . $currentYear . ' dari ' . $totalWorkCount . ' paket')
                 ->descriptionIcon('heroicon-m-document-text')
                 ->color('emerald'),
-            Stat::make('Total Selesai', $completedCount)
-                ->description($totalWorkCount > 0 ? $completedCount . ' dari ' . $totalWorkCount . ' paket telah selesai' : 'Jumlah proyek yang telah selesai')
+            Stat::make('Total Fisik Selesai', $completedCount)
+                ->description('Jumlah Proses fisik selesai tahun ' . $currentYear)
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('violet'),
+            Stat::make('Total PHO', $phoCount)
+                ->description('Jumlah PHO Selesai tahun ' . $currentYear)
+                ->descriptionIcon('heroicon-m-clipboard-document-check')
+                ->color('indigo'),
+            Stat::make('Total Progres Pembayaran', $paymentProgressCount)
+                ->description('Jumlah paket dalam progres pembayaran tahun ' . $currentYear)
+                ->descriptionIcon('heroicon-m-currency-dollar')
+                ->color('amber'),
+            Stat::make('Total Paket Selesai', $completedPackageCount)
+                ->description('Jumlah paket selesai tahun ' . $currentYear . ' dari ' . $totalWorkCount . ' paket')
+                ->descriptionIcon('heroicon-m-flag')
+                ->color('green'),
         ];
     }
 }

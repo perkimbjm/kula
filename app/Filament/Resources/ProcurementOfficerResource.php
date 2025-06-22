@@ -44,7 +44,7 @@ class ProcurementOfficerResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
+            ->selectable()            ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable()

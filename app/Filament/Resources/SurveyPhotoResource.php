@@ -48,7 +48,7 @@ class SurveyPhotoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(SurveyPhoto::query())
+            ->selectable()            ->query(SurveyPhoto::query())
             ->columns([
                 Tables\Columns\TextColumn::make('survey.name')
                     ->label('Nama Survei')
