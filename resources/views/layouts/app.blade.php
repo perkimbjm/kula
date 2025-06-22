@@ -41,5 +41,8 @@
 
     @stack('after-script')
 
+    <!-- MapPicker Form Restoration Fix -->
+    <script src="{{ asset('js/map-picker-fix.js') }}"></script>
+
 </body>
 </html>

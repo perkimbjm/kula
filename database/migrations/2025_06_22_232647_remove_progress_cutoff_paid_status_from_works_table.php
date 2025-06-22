@@ -12,15 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('works', function (Blueprint $table) {
-            // Drop indexes if they exist
-            $indexes = ['works_status_year_index', 'works_contractor_id_status_index', 'works_progress_index'];
-
-            foreach ($indexes as $index) {
-                if (Schema::hasIndex('works', $index)) {
-                    $table->dropIndex($index);
-                }
-            }
-
             // Drop columns
             $table->dropColumn(['progress', 'cutoff', 'paid', 'status']);
         });
@@ -37,11 +28,6 @@ return new class extends Migration
             $table->date('cutoff')->after('progress');
             $table->string('status')->default('belum kontrak')->after('cutoff');
             $table->float('paid')->nullable()->after('status');
-
-            // Recreate indexes
-            $table->index(['status', 'year']);
-            $table->index(['contractor_id', 'status']);
-            $table->index(['progress']);
         });
     }
 };

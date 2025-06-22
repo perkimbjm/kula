@@ -134,68 +134,58 @@ class FacilityResource extends Resource
                         ->hiddenLabel()
                         ->hidden(),
 
+                    // Visible coordinate inputs untuk user
                     TextInput::make('lat')
                         ->label('Latitude')
-                        ->placeholder('Contoh: -2.33668')
-                        ->reactive()
-                        ->afterStateUpdated(function (Set $set, Get $get, $state, $livewire): void {
-                             $lng = $get('lng');
-                             if ($state && $lng && is_numeric($state) && is_numeric($lng)) {
-                                 $set('location', ['lat' => (string)$state, 'lng' => (string)$lng]);
-                                 $set('latitude', (string)$state);  // Sync ke hidden field
-                                 $set('longitude', (string)$lng);   // Sync ke hidden field
-                                 $livewire->dispatch('refreshMap');
-                             }
-                         })
-                        ->rules(['nullable', 'numeric', 'between:-90,90']),
+                        ->placeholder('Contoh: -6.200000')
+                        ->numeric()
+                        ->step(0.000001)
+                        ->rules(['nullable', 'numeric', 'between:-90,90'])
+                        ->afterStateUpdated(function (Set $set, Get $get, $state): void {
+                            $lng = $get('lng');
+                            if ($state && $lng && is_numeric($state) && is_numeric($lng)) {
+                                $set('location', ['lat' => (float)$state, 'lng' => (float)$lng]);
+                                $set('latitude', (string)$state);
+                                $set('longitude', (string)$lng);
+                            }
+                        }),
 
                     TextInput::make('lng')
                         ->label('Longitude')
-                        ->placeholder('Contoh: 115.46028')
-                        ->reactive()
-                        ->afterStateUpdated(function (Set $set, Get $get, $state, $livewire): void {
-                             $lat = $get('lat');
-                             if ($state && $lat && is_numeric($state) && is_numeric($lat)) {
-                                 $set('location', ['lat' => (string)$lat, 'lng' => (string)$state]);
-                                 $set('latitude', (string)$lat);    // Sync ke hidden field
-                                 $set('longitude', (string)$state); // Sync ke hidden field
-                                 $livewire->dispatch('refreshMap');
-                             }
-                         })
-                        ->rules(['nullable', 'numeric', 'between:-180,180']),
+                        ->placeholder('Contoh: 106.816666')
+                        ->numeric()
+                        ->step(0.000001)
+                        ->rules(['nullable', 'numeric', 'between:-180,180'])
+                        ->afterStateUpdated(function (Set $set, Get $get, $state): void {
+                            $lat = $get('lat');
+                            if ($state && $lat && is_numeric($state) && is_numeric($lat)) {
+                                $set('location', ['lat' => (float)$lat, 'lng' => (float)$state]);
+                                $set('latitude', (string)$lat);
+                                $set('longitude', (string)$state);
+                            }
+                        }),
 
                     Map::make('location')
                         ->label('Pilih Lokasi di Peta')
                         ->columnSpanFull()
                         ->defaultLocation(latitude: -2.33668, longitude: 115.46028)
                         ->afterStateUpdated(function (Set $set, ?array $state): void {
-                            // Debug: Log state untuk troubleshooting
-                            Log::info('FacilityResource MapPicker afterStateUpdated:', $state ?? []);
-
                             if ($state && isset($state['lat']) && isset($state['lng'])) {
-                                // Cast ke string untuk konsistensi dengan database
                                 $lat = (string) $state['lat'];
                                 $lng = (string) $state['lng'];
 
-                                // Set ke field yang visible
                                 $set('lat', $lat);
                                 $set('lng', $lng);
-
-                                // Set ke hidden fields untuk MapPicker
                                 $set('latitude', $lat);
                                 $set('longitude', $lng);
-
-                                // Debug: Log koordinat yang di-set
-                                Log::info('FacilityResource Setting coordinates:', ['lat' => $lat, 'lng' => $lng]);
                             }
                         })
                         ->afterStateHydrated(function ($state, $record, Set $set): void {
                             if ($record && $record->lat && $record->lng) {
                                 $set('location', [
-                                    'lat' => $record->lat,
-                                    'lng' => $record->lng
+                                    'lat' => (float)$record->lat,
+                                    'lng' => (float)$record->lng
                                 ]);
-                                // Sync ke hidden fields juga
                                 $set('latitude', $record->lat);
                                 $set('longitude', $record->lng);
                             }
@@ -208,7 +198,8 @@ class FacilityResource extends Resource
                         ->showFullscreenControl()
                         ->liveLocation(false, false, 5000)
                         ->zoom(15)
-                        ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png"),
+                        ->tilesUrl("https://tile.openstreetmap.de/{z}/{x}/{y}.png")
+                        ->extraStyles(['min-height: 50vh']),
                 ])
                 ->columns(2),
 
@@ -267,117 +258,12 @@ class FacilityResource extends Resource
                         ->step(0.01)
                         ->suffix('%'),
 
-                    Forms\Components\Textarea::make('note')
-                        ->label('Catatan Konsultan')
-                        ->rows(3)
-                        ->columnSpanFull(),
+
                 ])
-                ->columns(3),
+                ->columns(4),
 
-            Section::make('Dokumentasi Foto')
+            Section::make('Dokumen Pendukung')
                 ->schema([
-                    Forms\Components\Group::make([
-                    Forms\Components\FileUpload::make('photo_0')
-                            ->label('Foto 1 (File)')
-                        ->image()
-                            ->imageEditor()
-                            ->directory('facility/photos')
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('photo_0_url')
-                            ->label('Foto 1 (URL Alternatif)')
-                            ->url()
-                            ->placeholder('https://example.com/photo1.jpg')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-
-                    Forms\Components\Group::make([
-                    Forms\Components\FileUpload::make('photo_50')
-                            ->label('Foto 2 (File)')
-                        ->image()
-                            ->imageEditor()
-                            ->directory('facility/photos')
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('photo_50_url')
-                            ->label('Foto 2 (URL Alternatif)')
-                            ->url()
-                            ->placeholder('https://example.com/photo2.jpg')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-
-                    Forms\Components\Group::make([
-                    Forms\Components\FileUpload::make('photo_100')
-                            ->label('Foto 3 (File)')
-                        ->image()
-                            ->imageEditor()
-                            ->directory('facility/photos')
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('photo_100_url')
-                            ->label('Foto 3 (URL Alternatif)')
-                            ->url()
-                            ->placeholder('https://example.com/photo3.jpg')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-
-                    Forms\Components\Group::make([
-                    Forms\Components\FileUpload::make('photo_pho')
-                            ->label('Foto 4 (File)')
-                        ->image()
-                            ->imageEditor()
-                            ->directory('facility/photos')
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('photo_pho_url')
-                            ->label('Foto 4 (URL Alternatif)')
-                            ->url()
-                            ->placeholder('https://example.com/photo4.jpg')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-                ])
-                ->columns(1),
-
-            Section::make('File Teknis')
-                ->schema([
-                    Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('shop_drawing')
-                            ->label('Shop Drawing (File)')
-                            ->directory('facility/drawings')
-                            ->acceptedFileTypes(['application/pdf', 'application/zip', 'application/x-zip-compressed', '.dwg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('shop_drawing_url')
-                            ->label('Shop Drawing (URL)')
-                            ->url()
-                            ->placeholder('https://example.com/shop_drawing.pdf')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-
-                    Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('asbuilt_drawing')
-                            ->label('Asbuilt Drawing (File)')
-                            ->directory('facility/drawings')
-                            ->acceptedFileTypes(['application/pdf', 'application/zip', 'application/x-zip-compressed', '.dwg'])
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('asbuilt_drawing_url')
-                            ->label('Asbuilt Drawing (URL)')
-                            ->url()
-                            ->placeholder('https://example.com/asbuilt_drawing.pdf')
-                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
-                            ->columnSpan(1),
-                    ])->columns(3),
-
                     Forms\Components\Group::make([
                         Forms\Components\FileUpload::make('rab')
                             ->label('RAB (File)')
@@ -415,62 +301,61 @@ class FacilityResource extends Resource
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('laporan')
-                            ->label('Laporan (Multi File)')
-                        ->multiple()
-                            ->reorderable()
-                            ->appendFiles()
-                            ->maxFiles(10)
-                            ->directory('facility/reports')
-                            ->helperText('Dapat upload multiple file. Klik "Add files" untuk menambah file baru.')
+                        Forms\Components\FileUpload::make('file_dwg')
+                            ->label('File DWG (File)')
+                            ->directory('facility/dwg')
+                            ->acceptedFileTypes(['application/acad', 'image/vnd.dwg', 'application/octet-stream'])
                             ->columnSpan(2),
 
-                        Forms\Components\Textarea::make('laporan_url')
-                            ->label('Laporan (URL)')
-                            ->placeholder("https://example.com/laporan1.pdf\nhttps://example.com/laporan2.pdf")
-                            ->helperText('Opsional: Masukkan URL (satu per baris) jika tidak ingin upload file')
-                            ->rows(4)
-                            ->columnSpan(1),
-                    ])->columns(3),
-
-                    Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('file_konsultan_perencana')
-                            ->label('File Konsultan Perencana (File)')
-                            ->directory('facility/consultants')
-                            ->columnSpan(2),
-
-                        Forms\Components\TextInput::make('file_konsultan_perencana_url')
-                            ->label('File Konsultan Perencana (URL)')
+                        Forms\Components\TextInput::make('file_dwg_url')
+                            ->label('File DWG (URL)')
                             ->url()
-                            ->placeholder('https://example.com/konsultan_perencana.pdf')
+                            ->placeholder('https://example.com/drawing.dwg')
                             ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
                             ->columnSpan(1),
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('file_konsultan_pengawas')
-                            ->label('File Konsultan Pengawas (File)')
-                            ->directory('facility/consultants')
+                        Forms\Components\FileUpload::make('file_pdf')
+                            ->label('File PDF (File)')
+                            ->directory('facility/pdf')
+                            ->acceptedFileTypes(['application/pdf'])
                             ->columnSpan(2),
 
-                        Forms\Components\TextInput::make('file_konsultan_pengawas_url')
-                            ->label('File Konsultan Pengawas (URL)')
+                        Forms\Components\TextInput::make('file_pdf_url')
+                            ->label('File PDF (URL)')
                             ->url()
-                            ->placeholder('https://example.com/konsultan_pengawas.pdf')
+                            ->placeholder('https://example.com/document.pdf')
                             ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
                             ->columnSpan(1),
                     ])->columns(3),
 
                     Forms\Components\Group::make([
-                        Forms\Components\FileUpload::make('file_kontraktor_pelaksana')
-                            ->label('File Kontraktor Pelaksana (File)')
-                            ->directory('facility/contractors')
+                        Forms\Components\FileUpload::make('file_jpg')
+                            ->label('File JPG (File)')
+                            ->directory('facility/images')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg'])
                             ->columnSpan(2),
 
-                        Forms\Components\TextInput::make('file_kontraktor_pelaksana_url')
-                            ->label('File Kontraktor Pelaksana (URL)')
+                        Forms\Components\TextInput::make('file_jpg_url')
+                            ->label('File JPG (URL)')
                             ->url()
-                            ->placeholder('https://example.com/kontraktor_pelaksana.pdf')
+                            ->placeholder('https://example.com/image.jpg')
+                            ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
+                            ->columnSpan(1),
+                    ])->columns(3),
+
+                    Forms\Components\Group::make([
+                        Forms\Components\FileUpload::make('file_png')
+                            ->label('File PNG (File)')
+                            ->directory('facility/images')
+                            ->acceptedFileTypes(['image/png'])
+                            ->columnSpan(2),
+
+                        Forms\Components\TextInput::make('file_png_url')
+                            ->label('File PNG (URL)')
+                            ->url()
+                            ->placeholder('https://example.com/image.png')
                             ->helperText('Opsional: Masukkan URL jika tidak ingin upload file')
                             ->columnSpan(1),
                     ])->columns(3),
