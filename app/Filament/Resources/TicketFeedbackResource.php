@@ -18,6 +18,8 @@ use App\Filament\Resources\TicketFeedbackResource\Pages;
 use App\Filament\Resources\TicketFeedbackResource\RelationManagers;
 use IbrahimBougaoua\FilamentRatingStar\Columns\Components\RatingStar;
 use IbrahimBougaoua\FilamentRatingStar\Forms\Components\RatingStar as RatingStarForm;
+use Closure;
+use Illuminate\Support\Facades\Gate;
 
 class TicketFeedbackResource extends Resource
 {
@@ -40,13 +42,17 @@ class TicketFeedbackResource extends Resource
 
                         $user = Auth::user();
 
-                        // Check if the user's role_id is 2  
-                        if ($user && $user->role_id == 2) {  
-                            $query->whereHas('ticketResponses', function ($q) use ($user) {  
-                                $q->where('user_id', $user->id);  
-                            });  
-                        }  
-                                        
+                        // Check if the user's role_id is 2 (Warga)
+                        if ($user && $user->role_id == 2) {
+                            $query->where('user_id', $user->id)
+                                  ->whereHas('ticketResponses'); // Hanya ticket yang sudah ada response
+                        } elseif ($user && $user->role_id == 3) { // Admin
+                            // Ambil ticket_id dari response yang dibuat oleh admin ini
+                            $ticketIds = TicketResponse::where('admin_id', $user->id)
+                                ->pluck('ticket_id');
+                            $query->whereIn('id', $ticketIds);
+                        }
+
                         if ($record) {
                             $query->where(function ($q) use ($record) {
                                 $q->whereDoesntHave('feedback')
@@ -56,15 +62,15 @@ class TicketFeedbackResource extends Resource
                             $query->whereDoesntHave('feedback');
                         }
 
-                        return $query->get()  
-                        ->map(function ($ticket) {  
-                            return [  
-                                'value' => $ticket->id,  
-                                'label' => $ticket->ticket_number . ' (' . Carbon::parse($ticket->updated_at)->format('d M Y H:i') . ')'  
-                            ];  
-                        })  
-                        ->pluck('label', 'value')  
-                        ->toArray();  
+                        return $query->get()
+                        ->map(function ($ticket) {
+                            return [
+                                'value' => $ticket->id,
+                                'label' => $ticket->ticket_number . ' (' . Carbon::parse($ticket->updated_at)->format('d M Y H:i') . ')'
+                            ];
+                        })
+                        ->pluck('label', 'value')
+                        ->toArray();
                     })
                     ->required()
                     ->reactive()
@@ -114,7 +120,7 @@ class TicketFeedbackResource extends Resource
             ->selectable()            ->query(function (Builder $query) {
                 $user = Auth::user();
                 $baseQuery = static::getModel()::query()->with(['ticket', 'user']);
-                
+
                 if ($user->role_id === 3) { // Admin
                     // Ambil ticket_id dari response yang dibuat oleh admin ini
                     $ticketIds = TicketResponse::where('admin_id', $user->id)
@@ -123,7 +129,7 @@ class TicketFeedbackResource extends Resource
                 } elseif ($user->role_id === 2) { // Warga
                     return $baseQuery->where('user_id', $user->id);
                 }
-                
+
                 return $baseQuery;
             })
             ->columns([
@@ -180,7 +186,7 @@ class TicketFeedbackResource extends Resource
         return static::getModel()::count();
     }
 
-    protected function getTableRecordActionUsing(): ?Closure
+    public static function getTableRecordActionUsing(): ?Closure
     {
         return function (TicketFeedback $record): bool {
             $user = Auth::user();
@@ -189,5 +195,14 @@ class TicketFeedbackResource extends Resource
             }
             return true;
         };
+    }
+
+    public static function canViewAny(): bool
+    {
+        $user = Auth::user();
+
+        // Memanggil policy langsung tanpa Gate
+        $policy = app(\App\Policies\TicketFeedbackPolicy::class);
+        return $policy->viewAny($user);
     }
 }

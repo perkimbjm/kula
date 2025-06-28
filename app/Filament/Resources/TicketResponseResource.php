@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use App\Filament\Resources\TicketResponseResource\Pages;
 use App\Filament\Resources\TicketResponseResource\RelationManagers;
+use Illuminate\Support\Facades\Gate;
 
 class TicketResponseResource extends Resource
 {
@@ -34,7 +35,15 @@ class TicketResponseResource extends Resource
                     ->label('Nomor Tiket')
                     ->options(function (callable $get, $record) {
                         $query = Ticket::query();
-                        
+
+                        $user = Auth::user();
+
+                        // Jika pengguna memiliki role_id 2 (Warga), mereka hanya boleh melihat tiket mereka sendiri
+                        if ($user->role_id === 2) {
+                            $query->where('user_id', $user->id);
+                        }
+                        // Role_id 3 (Admin) dan 1 (Super Admin) bisa melihat semua tiket
+
                         if ($record) {
                             // Jika mode edit, include tiket yang sedang diedit
                             $query->where(function ($q) use ($record) {
@@ -45,7 +54,7 @@ class TicketResponseResource extends Resource
                             // Jika mode create, hanya tampilkan tiket tanpa response
                             $query->whereDoesntHave('ticketResponses');
                         }
-                        
+
                         return $query->get()
                             ->pluck('ticket_number', 'id')
                             ->toArray();
@@ -167,11 +176,27 @@ class TicketResponseResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        // Jika pengguna memiliki role_id 2, mereka hanya boleh melihat tiket mereka sendiri
-        if (Auth::user()->role_id == 2) {
-            $query->where('user_id', Auth::id());
+        $user = Auth::user();
+
+        // Jika pengguna memiliki role_id 2 (Warga), mereka hanya boleh melihat response untuk tiket mereka sendiri
+        if ($user->role_id === 2) {
+            $query->where('user_id', $user->id);
         }
+        // Jika pengguna memiliki role_id 3 (Admin), mereka hanya boleh melihat response yang mereka buat
+        elseif ($user->role_id === 3) {
+            $query->where('admin_id', $user->id);
+        }
+        // Role_id 1 (Super Admin) bisa melihat semua response
 
         return $query;
+    }
+
+    public static function canViewAny(): bool
+    {
+        $user = Auth::user();
+
+        // Memanggil policy langsung tanpa Gate
+        $policy = app(\App\Policies\TicketResponsePolicy::class);
+        return $policy->viewAny($user);
     }
 }

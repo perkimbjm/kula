@@ -1,12 +1,12 @@
 <?php
-
+// Policy untuk mengatur hak akses Worksheet berbasis permission Spatie
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Village;
+use App\Models\Worksheet;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class VillagePolicy
+class WorksheetPolicy
 {
     use HandlesAuthorization;
 
@@ -15,16 +15,15 @@ class VillagePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_village');
+        return $user->can('view_any_worksheet');
     }
-
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Village $village): bool
+    public function view(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('view_village');
+        return $user->can('view_worksheet');
     }
 
     /**
@@ -32,23 +31,23 @@ class VillagePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_village');
+        return $user->can('create_worksheet');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Village $village): bool
+    public function update(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('update_village');
+        return $user->can('update_worksheet');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Village $village): bool
+    public function delete(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('delete_village');
+        return $user->can('delete_worksheet');
     }
 
     /**
@@ -56,15 +55,15 @@ class VillagePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_village');
+        return $user->can('delete_any_worksheet');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Village $village): bool
+    public function forceDelete(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('force_delete_village');
+        return $user->can('force_delete_worksheet');
     }
 
     /**
@@ -72,15 +71,15 @@ class VillagePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_village');
+        return $user->can('force_delete_any_worksheet');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Village $village): bool
+    public function restore(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('restore_village');
+        return $user->can('restore_worksheet');
     }
 
     /**
@@ -88,15 +87,15 @@ class VillagePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_village');
+        return $user->can('restore_any_worksheet');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Village $village): bool
+    public function replicate(User $user, Worksheet $worksheet): bool
     {
-        return $user->can('replicate_village');
+        return $user->can('replicate_worksheet');
     }
 
     /**
@@ -104,6 +103,7 @@ class VillagePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_village');
+        return $user->can('reorder_worksheet');
     }
 }
+// Perubahan: WorksheetPolicy sekarang mengikuti struktur dan method WorkPolicy, semua permission worksheet di-handle sesuai standar Spatie.

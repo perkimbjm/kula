@@ -3,27 +3,27 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Work;
+use App\Models\Facility;
 use Illuminate\Support\Facades\Cache;
 
 class WorkScoreboard extends Component
 {
-    public $works;
+    public $facilities;
     public $limit = 50;
     public $showAll = false;
 
     public function mount()
     {
-        $this->fetchWorks();
+        $this->fetchFacilities();
     }
 
-    public function fetchWorks()
+    public function fetchFacilities()
     {
         // Cache scoreboard data untuk mengurangi database load
-        $cacheKey = 'work_scoreboard_' . $this->limit;
+        $cacheKey = 'facility_scoreboard_' . $this->limit;
 
-        $this->works = Cache::remember($cacheKey, 300, function () { // Cache 5 menit
-            return Work::forDashboard()
+        $this->facilities = Cache::remember($cacheKey, 300, function () { // Cache 5 menit
+            return Facility::with('work')
                 ->limit($this->limit)
                 ->get()
                 ->toArray();
@@ -33,21 +33,21 @@ class WorkScoreboard extends Component
     public function loadMore()
     {
         $this->limit += 25;
-        $this->fetchWorks();
+        $this->fetchFacilities();
     }
 
-    public function showAllWorks()
+    public function showAllFacilities()
     {
         $this->showAll = true;
         $this->limit = 1000; // Reasonable limit untuk performa
-        $this->fetchWorks();
+        $this->fetchFacilities();
     }
 
     public function refreshData()
     {
         // Clear cache dan refresh data
-        Cache::forget('work_scoreboard_' . $this->limit);
-        $this->fetchWorks();
+        Cache::forget('facility_scoreboard_' . $this->limit);
+        $this->fetchFacilities();
 
         $this->dispatch('notify', [
             'type' => 'success',

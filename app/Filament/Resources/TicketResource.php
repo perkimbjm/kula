@@ -49,20 +49,20 @@ class TicketResource extends Resource
                     ->label('Kecamatan')
                     ->relationship('district', 'name')
                     ->required()
-                    ->reactive(),                
+                    ->reactive(),
                 Forms\Components\Select::make('village_id')
                     ->label('Kelurahan / Desa')
                     ->relationship('village', 'name')
                     ->options(function ($get) {
                         $districtId = $get('district_id');
-                        return $districtId 
-                            ? \App\Models\District::find($districtId)->villages->pluck('name', 'id') 
+                        return $districtId
+                            ? \App\Models\District::find($districtId)->villages->pluck('name', 'id')
                             : [];
                     })
                     ->required(),
                 Forms\Components\FileUpload::make('photo_url')
                     ->label('Foto/Gambar Bukti Dukung')
-                    ->image()  
+                    ->image()
                     ->directory('aduan')
                     ->columnSpanFull(),
                 Forms\Components\Grid::make(2)
@@ -190,23 +190,6 @@ class TicketResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $user = Auth::user();
-        if ($user->role_id === 2) {
-            return static::getModel()::where('user_id', $user->id)->count();
-        }
         return static::getModel()::count();
-    }
-    
-
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-
-        // Jika pengguna memiliki role_id 2, mereka hanya boleh melihat tiket mereka sendiri
-        if (Auth::user()->role_id == 2) {
-            $query->where('user_id', Auth::id());
-        }
-
-        return $query;
     }
 }

@@ -95,4 +95,6 @@ class VillageResource extends Resource
             'index' => Pages\ManageVillages::route('/'),
         ];
     }
+
+
 }

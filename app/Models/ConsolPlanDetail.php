@@ -16,11 +16,9 @@ class ConsolPlanDetail extends Model
      * @var array
      */
     protected $fillable = [
-        'consolidation_id',
-        'budget',
         'name',
         'nego_value',
-        'consol_plan_id',
+        'ee',
     ];
 
     /**
@@ -30,10 +28,8 @@ class ConsolPlanDetail extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'consolidation_id' => 'integer',
-        'budget' => 'float',
         'nego_value' => 'float',
-        'consol_plan_id' => 'integer',
+        'ee' => 'decimal:2',
     ];
 
     public function consolPlan(): BelongsTo

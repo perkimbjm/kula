@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\FacilityResource\RelationManagers;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class FacilityResource extends Resource
@@ -64,7 +65,8 @@ class FacilityResource extends Resource
                                 }
                             }
                         })
-                        ->columnSpanFull(),
+                        ->columnSpanFull()
+                        ->disabled(fn () => Auth::user()?->hasRole('rekanan')),
 
                     Forms\Components\TextInput::make('contract_number_display')
                         ->label('No. Kontrak')
@@ -140,7 +142,7 @@ class FacilityResource extends Resource
                         ->placeholder('Contoh: -6.200000')
                         ->numeric()
                         ->step(0.000001)
-                        ->rules(['nullable', 'numeric', 'between:-90,90'])
+                        ->rules(['nullable', 'numeric'])
                         ->afterStateUpdated(function (Set $set, Get $get, $state): void {
                             $lng = $get('lng');
                             if ($state && $lng && is_numeric($state) && is_numeric($lng)) {
@@ -155,7 +157,7 @@ class FacilityResource extends Resource
                         ->placeholder('Contoh: 106.816666')
                         ->numeric()
                         ->step(0.000001)
-                        ->rules(['nullable', 'numeric', 'between:-180,180'])
+                        ->rules(['nullable', 'numeric'])
                         ->afterStateUpdated(function (Set $set, Get $get, $state): void {
                             $lat = $get('lat');
                             if ($state && $lat && is_numeric($state) && is_numeric($lat)) {
@@ -367,6 +369,28 @@ class FacilityResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                $user = Auth::user();
+
+                // Jika user memiliki role 'rekanan', filter berdasarkan vendor_id
+                if ($user && $user->hasRole('rekanan')) {
+                    $vendor = $user->vendor()->first();
+
+                    if ($vendor) {
+                        if ($vendor->vendor_type === 'kontraktor' && $vendor->contractor_id) {
+                            $query->whereHas('work', function ($q) use ($vendor) {
+                                $q->where('contractor_id', $vendor->contractor_id);
+                            });
+                        } elseif ($vendor->vendor_type === 'konsultan' && $vendor->consultant_id) {
+                            $query->whereHas('work', function ($q) use ($vendor) {
+                                $q->where('consultant_id', $vendor->consultant_id);
+                            });
+                        }
+                    }
+                }
+
+                return $query;
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('work.contract_number')
                     ->label('No. Kontrak')

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Set;
 use Filament\Forms\Get;
 use Dotswan\MapPicker\Fields\Map;
+use Illuminate\Support\Facades\Auth;
 
 
 class WorkResource extends Resource
@@ -295,8 +296,23 @@ class WorkResource extends Resource
     {
         return $table
             ->selectable()
-            ->modifyQueryUsing(fn (Builder $query) =>
-                $query->with([
+            ->modifyQueryUsing(function (Builder $query) {
+                $user = Auth::user();
+
+                // Jika user memiliki role 'rekanan', filter berdasarkan vendor_id
+                if ($user && $user->hasRole('rekanan')) {
+                    $vendor = $user->vendor()->first();
+
+                    if ($vendor) {
+                        if ($vendor->vendor_type === 'kontraktor' && $vendor->contractor_id) {
+                            $query->where('contractor_id', $vendor->contractor_id);
+                        } elseif ($vendor->vendor_type === 'konsultan' && $vendor->consultant_id) {
+                            $query->where('consultant_id', $vendor->consultant_id);
+                        }
+                    }
+                }
+
+                return $query->with([
                     'district:id,name',
                     'village:id,name',
                     'contractor:id,name',
@@ -304,8 +320,8 @@ class WorkResource extends Resource
                     'supervisor:id,name',
                     'officers:id,name',
                     'procurementOfficer:id,name'
-                ])
-            )
+                ]);
+            })
             ->defaultPaginationPageOption(25)
             ->persistFiltersInSession()
             ->columns([

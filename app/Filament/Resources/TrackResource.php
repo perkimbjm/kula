@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\TrackResource\RelationManagers;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class TrackResource extends Resource
 {
@@ -255,6 +256,28 @@ class TrackResource extends Resource
     {
         return $table
             ->selectable()
+            ->modifyQueryUsing(function (Builder $query) {
+                $user = Auth::user();
+
+                // Jika user memiliki role 'rekanan', filter berdasarkan vendor_id
+                if ($user && $user->hasRole('rekanan')) {
+                    $vendor = $user->vendor()->first();
+
+                    if ($vendor) {
+                        if ($vendor->vendor_type === 'kontraktor' && $vendor->contractor_id) {
+                            $query->whereHas('work', function ($q) use ($vendor) {
+                                $q->where('contractor_id', $vendor->contractor_id);
+                            });
+                        } elseif ($vendor->vendor_type === 'konsultan' && $vendor->consultant_id) {
+                            $query->whereHas('work', function ($q) use ($vendor) {
+                                $q->where('consultant_id', $vendor->consultant_id);
+                            });
+                        }
+                    }
+                }
+
+                return $query;
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('work.name')
                     ->label('Nama Paket')

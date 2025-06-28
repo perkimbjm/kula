@@ -16,11 +16,9 @@ class ConsolSpvDetail extends Model
      * @var array
      */
     protected $fillable = [
-        'consolidation_id',
-        'budget',
         'name',
+        'ee',
         'nego_value',
-        'consol_spv_id',
     ];
 
     /**
@@ -30,10 +28,8 @@ class ConsolSpvDetail extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'consolidation_id' => 'integer',
-        'budget' => 'float',
+        'ee' => 'decimal:2',
         'nego_value' => 'float',
-        'consol_spv_id' => 'integer',
     ];
 
     public function consolSpv(): BelongsTo

@@ -83,7 +83,7 @@ class SurveyResource extends Resource
                             $livewire->dispatch('refreshMap');
                         }
                     })
-                    ->rules(['nullable', 'numeric', 'between:-90,90']),
+                    ->rules(['nullable', 'numeric']),
                 TextInput::make('lng')
                     ->label('Longitude')
                     ->placeholder('Contoh: 106.816666')
@@ -97,7 +97,7 @@ class SurveyResource extends Resource
                             $livewire->dispatch('refreshMap');
                         }
                     })
-                    ->rules(['nullable', 'numeric', 'between:-180,180']),
+                    ->rules(['nullable', 'numeric']),
                 Map::make('location')
                     ->label('Pilih Lokasi di Peta')
                     ->columnSpanFull()

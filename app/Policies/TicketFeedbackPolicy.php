@@ -15,6 +15,12 @@ class TicketFeedbackPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            return true; // Role 1,2,3 selalu bisa melihat
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('view_any_ticket::feedback');
     }
 
@@ -23,6 +29,15 @@ class TicketFeedbackPolicy
      */
     public function view(User $user, TicketFeedback $ticketFeedback): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            if ($user->role_id === 2) {
+                return $user->id === $ticketFeedback->user_id; // Warga hanya bisa melihat feedback sendiri
+            }
+            return true; // Role 1,3 bisa melihat semua
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('view_ticket::feedback');
     }
 
@@ -31,6 +46,12 @@ class TicketFeedbackPolicy
      */
     public function create(User $user): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            return true; // Role 1,2,3 selalu bisa create
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('create_ticket::feedback');
     }
 
@@ -39,6 +60,15 @@ class TicketFeedbackPolicy
      */
     public function update(User $user, TicketFeedback $ticketFeedback): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            if ($user->role_id === 2) {
+                return $user->id === $ticketFeedback->user_id; // Warga hanya bisa update feedback sendiri
+            }
+            return true; // Role 1,3 bisa update semua
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('update_ticket::feedback');
     }
 
@@ -47,6 +77,15 @@ class TicketFeedbackPolicy
      */
     public function delete(User $user, TicketFeedback $ticketFeedback): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            if ($user->role_id === 2) {
+                return $user->id === $ticketFeedback->user_id; // Warga hanya bisa delete feedback sendiri
+            }
+            return true; // Role 1,3 bisa delete semua
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('delete_ticket::feedback');
     }
 
@@ -55,6 +94,12 @@ class TicketFeedbackPolicy
      */
     public function deleteAny(User $user): bool
     {
+        // Role 1,2,3 menggunakan hard-coded logic
+        if (in_array($user->role_id, [1, 2, 3])) {
+            return in_array($user->role_id, [1, 3]); // Hanya role 1,3 yang bisa bulk delete
+        }
+
+        // Role 4+ menggunakan Shield permission
         return $user->can('delete_any_ticket::feedback');
     }
 

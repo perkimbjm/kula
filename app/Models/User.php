@@ -1,4 +1,8 @@
 <?php
+/**
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Vendor[] $vendor
+ * @method bool hasRole(string|array $role, string|null $guard = null)
+ */
 
 namespace App\Models;
 
@@ -11,11 +15,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Traits\Auditable;
 
 class User extends Authenticatable implements FilamentUser
 {
 
-    use HasRoles, Notifiable;
+    use HasRoles, Notifiable, Auditable;
     protected $fillable = [
         'name',
         'email',
@@ -76,14 +81,19 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(AuditLog::class);
     }
 
+    public function vendor(): HasMany
+    {
+        return $this->hasMany(Vendor::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
     }
 
-    public function unsetPassword()  
-    {  
-        $this->unsetRelation('password');  
-        $this->attributes['password'] = null;  
-    }  
+    public function unsetPassword()
+    {
+        $this->unsetRelation('password');
+        $this->attributes['password'] = null;
+    }
 }
